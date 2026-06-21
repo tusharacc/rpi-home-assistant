@@ -3,14 +3,14 @@
   "type": "feature",
   "workflowType": "full",
   "created": "2026-06-21T16:40:00Z",
-  "currentPhase": "developer",
+  "currentPhase": "reviewer",
   "status": "active",
   "branch": "feature/deskos-initial-dashboard",
   "roles": {
     "po": { "status": "complete", "completed": "2026-06-21T16:50:00Z" },
     "architect": { "status": "complete", "completed": "2026-06-21T17:00:00Z" },
-    "developer": { "status": "in-progress", "completed": null },
-    "reviewer": { "status": "pending", "completed": null },
+    "developer": { "status": "complete", "completed": "2026-06-21T17:30:00Z" },
+    "reviewer": { "status": "in-progress", "completed": null },
     "tester": { "status": "pending", "completed": null },
     "executor": { "status": "pending", "completed": null },
     "po-approval": { "status": "pending", "completed": null }
@@ -19,7 +19,7 @@
     "po": "artifacts/deskos-initial-dashboard.po.md",
     "architect": "artifacts/deskos-initial-dashboard.architect.md",
     "developer": "artifacts/deskos-initial-dashboard.developer.md",
-    "reviewer": null,
+    "reviewer": "artifacts/deskos-initial-dashboard.reviewer.md",
     "tester": null,
     "executor": null,
     "po-approval": null
@@ -28,6 +28,8 @@
     "po_complete": "2026-06-21T16:50:00Z",
     "architect_start": "2026-06-21T16:50:00Z",
     "architect_complete": "2026-06-21T17:00:00Z",
-    "developer_start": "2026-06-21T17:00:00Z"
+    "developer_start": "2026-06-21T17:00:00Z",
+    "developer_complete": "2026-06-21T17:30:00Z",
+    "reviewer_start": "2026-06-21T17:30:00Z"
   }
 }
