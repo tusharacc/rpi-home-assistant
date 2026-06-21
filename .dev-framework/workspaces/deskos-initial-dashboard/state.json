@@ -3,12 +3,12 @@
   "type": "feature",
   "workflowType": "full",
   "created": "2026-06-21T16:40:00Z",
-  "currentPhase": "po",
+  "currentPhase": "architect",
   "status": "active",
   "branch": "feature/deskos-initial-dashboard",
   "roles": {
-    "po": { "status": "in-progress", "completed": null },
-    "architect": { "status": "pending", "completed": null },
+    "po": { "status": "complete", "completed": "2026-06-21T16:50:00Z" },
+    "architect": { "status": "in-progress", "completed": null },
     "developer": { "status": "pending", "completed": null },
     "reviewer": { "status": "pending", "completed": null },
     "tester": { "status": "pending", "completed": null },
@@ -17,12 +17,15 @@
   },
   "artifacts": {
     "po": "artifacts/deskos-initial-dashboard.po.md",
-    "architect": null,
+    "architect": "artifacts/deskos-initial-dashboard.architect.md",
     "developer": null,
     "reviewer": null,
     "tester": null,
     "executor": null,
     "po-approval": null
   },
-  "timelines": {}
+  "timelines": {
+    "po_complete": "2026-06-21T16:50:00Z",
+    "architect_start": "2026-06-21T16:50:00Z"
+  }
 }
