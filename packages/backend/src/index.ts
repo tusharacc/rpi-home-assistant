@@ -13,7 +13,8 @@ app.get('/api/health', (_req, res) => {
 
 app.use(express.static(FRONTEND_DIST))
 
-app.get('*', (_req, res) => {
+// IMPORTANT: keep this last — all API routes must be registered above this line
+app.get(/^(?!\/api).*$/, (_req, res) => {
   res.sendFile(path.join(FRONTEND_DIST, 'index.html'))
 })
 
