@@ -3,15 +3,15 @@
   "type": "feature",
   "workflowType": "full",
   "created": "2026-06-29T14:00:00Z",
-  "currentPhase": "developer",
+  "currentPhase": "tester",
   "status": "active",
   "branch": "feature/add-epaper-subscriptions",
   "roles": {
     "po": { "status": "complete", "completed": "2026-06-29T14:30:00Z" },
     "architect": { "status": "complete", "completed": "2026-06-29T14:45:00Z" },
-    "developer": { "status": "in-progress", "completed": null },
-    "reviewer": { "status": "in-progress", "completed": null },
-    "tester": { "status": "pending", "completed": null },
+    "developer": { "status": "complete", "completed": "2026-06-29T15:30:00Z" },
+    "reviewer": { "status": "complete", "completed": "2026-06-29T15:45:00Z" },
+    "tester": { "status": "in-progress", "completed": null },
     "executor": { "status": "pending", "completed": null },
     "po-approval": { "status": "pending", "completed": null }
   },
@@ -20,7 +20,7 @@
     "architect": "artifacts/add-epaper-subscriptions.architect.md",
     "developer": "artifacts/add-epaper-subscriptions.developer.md",
     "reviewer": "artifacts/add-epaper-subscriptions.reviewer.md",
-    "tester": null,
+    "tester": "artifacts/add-epaper-subscriptions.tester.md",
     "executor": null,
     "po-approval": null
   },
@@ -30,6 +30,11 @@
     "architect_start": "2026-06-29T14:31:00Z",
     "architect_complete": "2026-06-29T14:45:00Z",
     "developer_start": "2026-06-29T14:46:00Z",
-    "reviewer_start": "2026-06-29T15:00:00Z"
+    "reviewer_start": "2026-06-29T15:00:00Z",
+    "developer_start_2": "2026-06-29T15:10:00Z",
+    "developer_complete_2": "2026-06-29T15:30:00Z",
+    "reviewer_start_2": "2026-06-29T15:31:00Z",
+    "reviewer_complete": "2026-06-29T15:45:00Z",
+    "tester_start": "2026-06-29T15:46:00Z"
   }
 }

@@ -1,7 +1,7 @@
 # Add Epaper Subscriptions — Reviewer Artifact
 
 **Feature:** add-epaper-subscriptions  
-**Status:** Issues found — returning to developer  
+**Status:** Approved (round 2)  
 **Created:** 2026-06-29
 
 ---
@@ -41,8 +41,8 @@ Fix: Use `command -v chromium-browser chromium 2>/dev/null | head -1` to detect 
 
 ## Approval Status
 
-- [ ] Approved
-- [x] Rejected — return to developer to fix M-1
+- [x] Approved
+- [ ] Rejected
 
 ---
 
