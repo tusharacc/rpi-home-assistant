@@ -32,11 +32,49 @@ Backend health: `http://localhost:3001/api/health`
 
 ## Deployment
 
-Runs unchanged on Raspberry Pi OS. Chromium launches in kiosk mode pointing to `http://localhost:<port>`.
+Runs unchanged on Raspberry Pi OS. Chromium launches in kiosk mode pointing to `http://localhost:3000`.
 
 ```
 systemd → Express backend → Chromium kiosk → DeskOS
 ```
+
+### RPi Setup (one-time)
+
+```bash
+# 1. Clone and build
+git clone https://github.com/tusharacc/rpi-home-assistant.git
+cd rpi-home-assistant
+npm install
+npm run build   # builds frontend into packages/backend/dist/frontend
+
+# 2. Make launch script executable
+chmod +x scripts/launch-kiosk.sh
+
+# 3. Install systemd services
+sudo cp scripts/deskos-backend.service /etc/systemd/system/
+sudo cp scripts/deskos-kiosk.service   /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable deskos-backend deskos-kiosk
+sudo systemctl start deskos-backend
+
+# 4. One-time epaper authentication (keyboard required — only during setup)
+#    Run this BEFORE enabling the kiosk service, or temporarily exit kiosk mode.
+#    Open Chromium with the same profile the kiosk uses:
+CHROMIUM_PROFILE=/home/pi/.deskos-chromium
+chromium-browser --user-data-dir="$CHROMIUM_PROFILE" http://localhost:3000
+#    In the sidebar: click News → The Hindu → click "Sign in with Google"
+#    Authenticate with tusharacc@gmail.com
+#    Repeat for News → LiveMint
+#    Close Chromium.
+
+# 5. Start the kiosk
+sudo systemctl start deskos-kiosk
+```
+
+> **Why `--disable-web-security`?**  
+> The Hindu and LiveMint epaper sites send `X-Frame-Options: SAMEORIGIN`, which prevents browsers from embedding them in iframes from a different origin (localhost). The kiosk launch script includes `--disable-web-security` to bypass this restriction. This is appropriate for a single-purpose personal appliance running a trusted local app — it is not a shared or general-purpose browser.
+
+> **Session expiry**: Google SSO sessions occasionally expire. If an epaper shows a login page instead of content, reconnect a keyboard and repeat step 4 above.
 
 ## Plugin Architecture
 
@@ -53,10 +91,6 @@ Each application is a plugin registered in `packages/frontend/src/plugins/regist
 | News › LiveMint | Active | ePaper iframe (`epaper.livemint.com`) |
 | News › Other News | Placeholder | Coming next feature |
 | Raspberry Pi Desktop | Placeholder | Coming later |
-
-## Authentication Note
-
-Epaper sources require subscriber login. Since the RPi has no keyboard in normal use, authentication is handled via **Chromium persistent profile**: log in once during initial setup (with keyboard attached), and the session cookie is preserved across reboots. DeskOS itself stores no credentials.
 
 ## UI Theme
 

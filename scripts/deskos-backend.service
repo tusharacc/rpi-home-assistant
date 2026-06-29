@@ -1,0 +1,17 @@
+[Unit]
+Description=DeskOS Backend
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/rpi-home-assistant
+ExecStart=/usr/bin/npm run start --workspace=packages/backend
+Restart=on-failure
+RestartSec=5
+Environment=NODE_ENV=production
+Environment=PORT=3001
+
+[Install]
+WantedBy=multi-user.target
