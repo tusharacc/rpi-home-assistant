@@ -3,13 +3,13 @@
   "type": "feature",
   "workflowType": "full",
   "created": "2026-06-29T14:00:00Z",
-  "currentPhase": "po",
+  "currentPhase": "developer",
   "status": "active",
   "branch": "feature/add-epaper-subscriptions",
   "roles": {
-    "po": { "status": "in-progress", "completed": null },
-    "architect": { "status": "pending", "completed": null },
-    "developer": { "status": "pending", "completed": null },
+    "po": { "status": "complete", "completed": "2026-06-29T14:30:00Z" },
+    "architect": { "status": "complete", "completed": "2026-06-29T14:45:00Z" },
+    "developer": { "status": "in-progress", "completed": null },
     "reviewer": { "status": "pending", "completed": null },
     "tester": { "status": "pending", "completed": null },
     "executor": { "status": "pending", "completed": null },
@@ -17,8 +17,8 @@
   },
   "artifacts": {
     "po": "artifacts/add-epaper-subscriptions.po.md",
-    "architect": null,
-    "developer": null,
+    "architect": "artifacts/add-epaper-subscriptions.architect.md",
+    "developer": "artifacts/add-epaper-subscriptions.developer.md",
     "reviewer": null,
     "tester": null,
     "executor": null,
@@ -26,6 +26,9 @@
   },
   "timelines": {
     "po_start": "2026-06-29T14:00:00Z",
-    "po_complete": "2026-06-29T14:30:00Z"
+    "po_complete": "2026-06-29T14:30:00Z",
+    "architect_start": "2026-06-29T14:31:00Z",
+    "architect_complete": "2026-06-29T14:45:00Z",
+    "developer_start": "2026-06-29T14:46:00Z"
   }
 }
