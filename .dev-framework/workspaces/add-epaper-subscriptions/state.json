@@ -25,6 +25,7 @@
     "po-approval": null
   },
   "timelines": {
-    "po_start": "2026-06-29T14:00:00Z"
+    "po_start": "2026-06-29T14:00:00Z",
+    "po_complete": "2026-06-29T14:30:00Z"
   }
 }
