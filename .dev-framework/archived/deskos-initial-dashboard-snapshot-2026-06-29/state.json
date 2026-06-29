@@ -4,8 +4,7 @@
   "workflowType": "full",
   "created": "2026-06-21T16:40:00Z",
   "currentPhase": "complete",
-  "status": "archived",
-  "archivedDate": "2026-06-29T00:15:00Z",
+  "status": "complete",
   "branch": "feature/deskos-initial-dashboard",
   "roles": {
     "po": { "status": "complete", "completed": "2026-06-21T16:50:00Z" },
