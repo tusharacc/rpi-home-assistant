@@ -45,7 +45,7 @@ systemd → Express backend → Chromium kiosk → DeskOS
 git clone https://github.com/tusharacc/rpi-home-assistant.git
 cd rpi-home-assistant
 npm install
-npm run build   # builds frontend into packages/backend/dist/frontend
+npm run build   # builds backend (tsc) then frontend (vite) into packages/backend/dist/
 
 # 2. Make launch script executable
 chmod +x scripts/launch-kiosk.sh

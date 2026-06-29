@@ -10,7 +10,7 @@
     "po": { "status": "complete", "completed": "2026-06-29T14:30:00Z" },
     "architect": { "status": "complete", "completed": "2026-06-29T14:45:00Z" },
     "developer": { "status": "in-progress", "completed": null },
-    "reviewer": { "status": "pending", "completed": null },
+    "reviewer": { "status": "in-progress", "completed": null },
     "tester": { "status": "pending", "completed": null },
     "executor": { "status": "pending", "completed": null },
     "po-approval": { "status": "pending", "completed": null }
@@ -19,7 +19,7 @@
     "po": "artifacts/add-epaper-subscriptions.po.md",
     "architect": "artifacts/add-epaper-subscriptions.architect.md",
     "developer": "artifacts/add-epaper-subscriptions.developer.md",
-    "reviewer": null,
+    "reviewer": "artifacts/add-epaper-subscriptions.reviewer.md",
     "tester": null,
     "executor": null,
     "po-approval": null
@@ -29,6 +29,7 @@
     "po_complete": "2026-06-29T14:30:00Z",
     "architect_start": "2026-06-29T14:31:00Z",
     "architect_complete": "2026-06-29T14:45:00Z",
-    "developer_start": "2026-06-29T14:46:00Z"
+    "developer_start": "2026-06-29T14:46:00Z",
+    "reviewer_start": "2026-06-29T15:00:00Z"
   }
 }
