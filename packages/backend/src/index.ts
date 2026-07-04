@@ -3,7 +3,7 @@ import path from 'path'
 
 const app = express()
 const PORT = process.env.PORT ?? 3001
-const FRONTEND_DIST = path.join(__dirname, '../../dist/frontend')
+const FRONTEND_DIST = path.join(__dirname, '../../../dist/frontend')
 
 app.use(express.json())
 
