@@ -32,7 +32,7 @@ Backend health: `http://localhost:3001/api/health`
 
 ## Deployment
 
-Runs unchanged on Raspberry Pi OS. Chromium launches in kiosk mode pointing to `http://localhost:3000`.
+Runs unchanged on Raspberry Pi OS. In production the Express backend serves the built frontend itself (no separate dev server), on port 3001. Chromium launches in kiosk mode pointing to `http://localhost:3001`.
 
 ```
 systemd → Express backend → Chromium kiosk → DeskOS
@@ -62,7 +62,7 @@ sudo systemctl start deskos-backend
 #    Open Chromium with the same profile the kiosk uses:
 CHROMIUM_PROFILE="$HOME/.deskos-chromium"
 CHROMIUM_BIN=$(command -v chromium-browser || command -v chromium)
-"$CHROMIUM_BIN" --user-data-dir="$CHROMIUM_PROFILE" http://localhost:3000
+"$CHROMIUM_BIN" --user-data-dir="$CHROMIUM_PROFILE" http://localhost:3001
 #    In the sidebar: click News → The Hindu → click "Sign in with Google"
 #    Authenticate with tusharacc@gmail.com
 #    Repeat for News → LiveMint

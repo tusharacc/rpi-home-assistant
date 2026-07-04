@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-DESKOS_URL="${DESKOS_URL:-http://localhost:3000}"
+DESKOS_URL="${DESKOS_URL:-http://localhost:3001}"
 CHROMIUM_PROFILE="${CHROMIUM_PROFILE:-$HOME/.deskos-chromium}"
 
 # Detect Chromium binary (chromium-browser on Bullseye, chromium on Bookworm)
