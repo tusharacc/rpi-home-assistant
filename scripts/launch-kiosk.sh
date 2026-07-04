@@ -2,7 +2,7 @@
 set -euo pipefail
 
 DESKOS_URL="${DESKOS_URL:-http://localhost:3000}"
-CHROMIUM_PROFILE="/home/pi/.deskos-chromium"
+CHROMIUM_PROFILE="${CHROMIUM_PROFILE:-$HOME/.deskos-chromium}"
 
 # Detect Chromium binary (chromium-browser on Bullseye, chromium on Bookworm)
 CHROMIUM_BIN=$(command -v chromium-browser || command -v chromium)

@@ -5,8 +5,8 @@ Wants=network.target
 
 [Service]
 Type=simple
-User=pi
-WorkingDirectory=/home/pi/rpi-home-assistant
+User=__DESKOS_USER__
+WorkingDirectory=__DESKOS_REPO_DIR__
 ExecStart=/usr/bin/npm run start --workspace=packages/backend
 Restart=on-failure
 RestartSec=5

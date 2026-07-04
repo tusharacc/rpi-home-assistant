@@ -47,21 +47,22 @@ cd rpi-home-assistant
 npm install
 npm run build   # builds backend (tsc) then frontend (vite) into packages/backend/dist/
 
-# 2. Make launch script executable
-chmod +x scripts/launch-kiosk.sh
+# 2. Make scripts executable
+chmod +x scripts/launch-kiosk.sh scripts/install-services.sh
 
 # 3. Install systemd services
-sudo cp scripts/deskos-backend.service /etc/systemd/system/
-sudo cp scripts/deskos-kiosk.service   /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable deskos-backend deskos-kiosk
+#    (substitutes the current user/home/repo path into the unit files —
+#    Raspberry Pi OS no longer defaults to a "pi" user, so these can't be
+#    hardcoded)
+./scripts/install-services.sh
 sudo systemctl start deskos-backend
 
 # 4. One-time epaper authentication (keyboard required — only during setup)
 #    Run this BEFORE enabling the kiosk service, or temporarily exit kiosk mode.
 #    Open Chromium with the same profile the kiosk uses:
-CHROMIUM_PROFILE=/home/pi/.deskos-chromium
-chromium-browser --user-data-dir="$CHROMIUM_PROFILE" http://localhost:3000
+CHROMIUM_PROFILE="$HOME/.deskos-chromium"
+CHROMIUM_BIN=$(command -v chromium-browser || command -v chromium)
+"$CHROMIUM_BIN" --user-data-dir="$CHROMIUM_PROFILE" http://localhost:3000
 #    In the sidebar: click News → The Hindu → click "Sign in with Google"
 #    Authenticate with tusharacc@gmail.com
 #    Repeat for News → LiveMint
