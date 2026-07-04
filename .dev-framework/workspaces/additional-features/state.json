@@ -3,12 +3,12 @@
   "type": "feature",
   "workflowType": "full",
   "created": "2026-07-04T13:14:24Z",
-  "currentPhase": "po",
+  "currentPhase": "architect",
   "status": "active",
   "branch": "feature/additional-features",
   "roles": {
-    "po": { "status": "in-progress", "completed": null },
-    "architect": { "status": "pending", "completed": null },
+    "po": { "status": "complete", "completed": "2026-07-04T13:22:46Z" },
+    "architect": { "status": "in-progress", "completed": null },
     "developer": { "status": "pending", "completed": null },
     "reviewer": { "status": "pending", "completed": null },
     "tester": { "status": "pending", "completed": null },
@@ -17,12 +17,15 @@
   },
   "artifacts": {
     "po": "artifacts/additional-features.po.md",
-    "architect": null,
+    "architect": "artifacts/additional-features.architect.md",
     "developer": null,
     "reviewer": null,
     "tester": null,
     "executor": null,
     "po-approval": null
   },
-  "timelines": {}
+  "timelines": {
+    "po_complete": "2026-07-04T13:22:46Z",
+    "architect_start": "2026-07-04T13:22:46Z"
+  }
 }
