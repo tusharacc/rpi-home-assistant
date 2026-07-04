@@ -1,8 +1,26 @@
 # Code Quality Report — additional-features
-Generated: 2026-07-04T13:42:51Z
+Generated: 2026-07-04T13:42:51Z (round 1, BLOCKED) / 2026-07-04T13:45:50Z (round 2, PASSED)
 Mode: reviewer
 
-## Summary
+## Round 2 Re-check (2026-07-04T13:45:50Z)
+
+Fix applied: `packages/backend/src/index.ts` now binds to `127.0.0.1` explicitly, verified via
+`lsof` (listening socket shows `127.0.0.1:<port>`, not `0.0.0.0:<port>`) and via `curl` against
+`/api/health` and `/api/settings` over loopback — both still respond `200`. No new `any`, `exec`/
+`eval`, or unvalidated-input patterns introduced by the fix (`Number(process.env.PORT ?? 3001)` is
+a safe coercion of an environment variable, not user input). SC-04 finding is resolved — the
+route-level lack of auth is no longer exploitable from the LAN, only from processes already
+running on the device itself, consistent with the appliance's existing threat model.
+
+## Summary (round 2 — current)
+
+| Agent | Status | Findings |
+|---|---|---|
+| Simplify | PASS / 2 findings | 2 advisory, 0 actionable-blocking |
+| Secure Coding | PASS | 0 critical, 0 high, 0 medium, 0 low |
+| Secret Detection | PASS | 0 secrets found |
+
+## Summary (round 1 — historical, superseded)
 
 | Agent | Status | Findings |
 |---|---|---|
@@ -20,9 +38,9 @@ Mode: reviewer
 2. **`SettingsPlugin.tsx`'s `isSettingsResponse`** guard nests parens more than necessary
    (`(('orientation' in value) && (...))`). Cosmetic only, no behavior difference. Advisory.
 
-## Secure Coding Findings
+## Secure Coding Findings (round 1 — RESOLVED in round 2, kept for history)
 
-### [HIGH] SC-04 — Broken Access Control (OWASP A01:2021)
+### [HIGH] SC-04 — Broken Access Control (OWASP A01:2021) — ✅ RESOLVED
 
 **File:** `packages/backend/src/index.ts:28` (pre-existing `app.listen(PORT, ...)`), in
 combination with the new mutating routes added by this diff:
