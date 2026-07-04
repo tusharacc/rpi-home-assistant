@@ -27,9 +27,13 @@ DeskOS is a Raspberry Pi personal information appliance. It's a full-screen kios
 
 ## Development vs. Deployment
 
-- Dev: `npm run dev` from repo root → frontend on 3000, backend on 3001.
+- Dev: `npm run dev` from repo root → frontend on 3000 (Vite dev server), backend on 3001.
+- **Production always serves on port 3001, never 3000.** There is no Vite dev server in production — the Express backend serves the built frontend itself from `dist/frontend`. Any script or doc pointing Chromium/kiosk at `localhost:3000` in a deployed context is a bug (this has happened before — `scripts/launch-kiosk.sh`'s `DESKOS_URL` default and the README's one-time auth command both regressed to `:3000` and had to be fixed).
 - The app must work identically on macOS (dev) and Raspberry Pi OS (deploy). No platform-specific code in the main codebase — use platform abstraction if needed.
 - No build step is needed during development; Vite handles HMR.
+- `FRONTEND_DIST` in `packages/backend/src/index.ts` is computed relative to `__dirname` of the *compiled* `dist/index.js` (which lives at `packages/backend/dist/`), not the source file. Reaching the repo-root `dist/frontend` from there requires three `../` segments (dist → backend → packages → repo root), not two — this was off by one and caused every production request to `/` to 404 while `/api/*` worked fine (masking the bug). If this path ever needs to change again, verify by curling `/` after a real `npm run build`, not just `/api/health`.
+- Raspberry Pi OS no longer creates a default `pi` user (Bookworm+) — never hardcode `User=pi` or `/home/pi/...` in systemd unit files or scripts. `scripts/deskos-backend.service` / `scripts/deskos-kiosk.service` use `__DESKOS_USER__` / `__DESKOS_REPO_DIR__` / `__DESKOS_HOME__` placeholders, substituted by `scripts/install-services.sh` at install time — install via that script, never `cp` the `.service` files directly.
+- Raspberry Pi OS Bookworm/Trixie run Wayland (Chromium via XWayland) rather than classic X11. Don't assume a static `~/.Xauthority` file for manual/SSH-driven Chromium launches — run interactive one-time steps (like epaper sign-in) from a terminal opened directly in the Pi's own graphical session instead of exporting `DISPLAY`/`XAUTHORITY` over SSH.
 
 ## Code Style
 

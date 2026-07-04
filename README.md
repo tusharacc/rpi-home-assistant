@@ -72,10 +72,22 @@ CHROMIUM_BIN=$(command -v chromium-browser || command -v chromium)
 sudo systemctl start deskos-kiosk
 ```
 
+> **Do step 4 at the Pi's physical desktop**, using the keyboard/mouse temporarily attached for setup — not over SSH. A terminal opened locally in the graphical session already has the correct display credentials; manually exporting `DISPLAY`/`XAUTHORITY` over SSH is unreliable (Raspberry Pi OS Bookworm/Trixie run Wayland with Chromium under XWayland, which doesn't use a static `~/.Xauthority` file the way classic X11 does) and typically fails with `Authorization required, but no authorization protocol specified`.
+
+> **First Chromium launch may prompt to set a keyring password** (for the OS credential store, e.g. gnome-keyring/libsecret). Any password works — it's separate from your Google account. This is currently a manual, interactive step; see the note below about kiosk reboots.
+
 > **Why `--disable-web-security`?**  
 > The Hindu and LiveMint epaper sites may send frame-blocking headers (`X-Frame-Options` / CSP `frame-ancestors`) that prevent embedding them in an iframe from a different origin. A backend-proxy workaround was evaluated and rejected: proxying the shell page server-side can't forward the browser's Google SSO session cookie (the proxy fetch runs on the Pi, not in the authenticated browser), so the embedded reader would always show a logged-out/paywalled view — and only the initial page load could be proxied, so any in-reader navigation would hit the same block again one click deep. The kiosk launch script instead uses `--disable-web-security` to bypass the restriction directly in the browser. This is appropriate for a single-purpose personal appliance running a trusted local app — it is not a shared or general-purpose browser.
 
 > **Session expiry**: Google SSO sessions occasionally expire. If an epaper shows a login page instead of content, reconnect a keyboard and repeat step 4 above.
+
+### Troubleshooting
+
+- **`localhost:3001` unreachable / kiosk shows "site cannot be reached"**: confirm the backend is actually up (`curl http://localhost:3001/api/health`) and that `scripts/launch-kiosk.sh`'s `DESKOS_URL` points at `3001`, not `3000` (`3000` is the dev-only Vite port — nothing listens there in production).
+- **Backend healthy but `/` 404s with a bare `Not Found` page**: the built frontend is missing or the backend can't find it. Confirm `dist/frontend/index.html` exists at the repo root (run `npm run build` from the repo root, not just the backend workspace) and that the file is readable by whichever user the systemd service runs as.
+- **`journalctl -u deskos-kiosk` full of D-Bus, GCM/phone-registration, Fontconfig, or VSync errors**: these are normal Chromium internal noise on a minimal kiosk session (no full session bus, no Play Services) — not the cause of a blank/unreachable page. Only investigate further if the kiosk fails to launch a window at all.
+- **`chromium-browser: command not found`**: expected on Bookworm/Trixie — the package is just `chromium`. `scripts/launch-kiosk.sh` already detects either name; if running Chromium manually, use `chromium` directly.
+- **Systemd services fail to start after cloning fresh**: re-run `./scripts/install-services.sh` — it templates `User=`/paths from the current user and repo location. Don't `cp` the `.service` files directly; they contain unresolved `__DESKOS_*__` placeholders.
 
 ## Plugin Architecture
 
