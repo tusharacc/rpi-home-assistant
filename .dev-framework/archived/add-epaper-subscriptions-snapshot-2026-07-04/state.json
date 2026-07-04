@@ -4,8 +4,7 @@
   "workflowType": "full",
   "created": "2026-06-29T14:00:00Z",
   "currentPhase": "complete",
-  "status": "archived",
-  "archivedDate": "2026-07-04T00:00:00Z",
+  "status": "active",
   "branch": "feature/add-epaper-subscriptions",
   "roles": {
     "po": { "status": "complete", "completed": "2026-06-29T14:30:00Z" },
