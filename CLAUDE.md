@@ -24,6 +24,9 @@ DeskOS is a Raspberry Pi personal information appliance. It's a full-screen kios
 - Plugin system lives in `packages/frontend/src/plugins/`. Each plugin is a self-contained directory.
 - Register plugins in `packages/frontend/src/plugins/registry.ts` — this is the only place to add sidebar entries.
 - Backend API routes are prefixed `/api/`. The SPA catch-all uses a negative-lookahead regex to exclude them.
+- `packages/backend/src/paths.ts` is the single source of truth for repo-root-relative paths (`REPO_ROOT`, `SCRIPTS_DIR`, `DATA_DIR`) computed from the compiled `dist/`. New backend files must import from here rather than recomputing `__dirname` depth themselves — that's exactly how the `FRONTEND_DIST` off-by-one bug happened.
+- Any backend route that shells out (rotation, standby, shutdown, etc.) must use `execFile` with an argument array, never `exec`/template strings, and must validate the input against a fixed enum before it ever reaches the shell.
+- The backend binds to `127.0.0.1` only (`app.listen(PORT, '127.0.0.1', ...)` in `index.ts`), not all interfaces. This app has mutating routes now (settings/rotate, standby, shutdown) — do not remove this binding or add a route without auth to a server that isn't loopback-restricted.
 
 ## Development vs. Deployment
 
@@ -33,13 +36,15 @@ DeskOS is a Raspberry Pi personal information appliance. It's a full-screen kios
 - No build step is needed during development; Vite handles HMR.
 - `FRONTEND_DIST` in `packages/backend/src/index.ts` is computed relative to `__dirname` of the *compiled* `dist/index.js` (which lives at `packages/backend/dist/`), not the source file. Reaching the repo-root `dist/frontend` from there requires three `../` segments (dist → backend → packages → repo root), not two — this was off by one and caused every production request to `/` to 404 while `/api/*` worked fine (masking the bug). If this path ever needs to change again, verify by curling `/` after a real `npm run build`, not just `/api/health`.
 - Raspberry Pi OS no longer creates a default `pi` user (Bookworm+) — never hardcode `User=pi` or `/home/pi/...` in systemd unit files or scripts. `scripts/deskos-backend.service` / `scripts/deskos-kiosk.service` use `__DESKOS_USER__` / `__DESKOS_REPO_DIR__` / `__DESKOS_HOME__` placeholders, substituted by `scripts/install-services.sh` at install time — install via that script, never `cp` the `.service` files directly.
+- Any feature needing a privileged one-off command (e.g. shutdown) follows the same templating pattern: a `scripts/*.sudoers` file scoped to the exact command only (never a broad passwordless grant), templated with `__DESKOS_USER__` and installed by `install-services.sh` via `visudo -c` validation before copying into `/etc/sudoers.d/`. See `scripts/deskos-shutdown.sudoers`.
 - Raspberry Pi OS Bookworm/Trixie run Wayland (Chromium via XWayland) rather than classic X11. Don't assume a static `~/.Xauthority` file for manual/SSH-driven Chromium launches — run interactive one-time steps (like epaper sign-in) from a terminal opened directly in the Pi's own graphical session instead of exporting `DISPLAY`/`XAUTHORITY` over SSH.
+- systemd services (`deskos-kiosk.service`'s `ExecStartPre`, `deskos-backend.service`) run outside any graphical login session, so they don't inherit `XDG_RUNTIME_DIR` or `WAYLAND_DISPLAY`. Chromium itself is fine because it runs via XWayland using the `DISPLAY`/`XAUTHORITY` env vars already set on the unit — but any *native* Wayland client (e.g. `wlr-randr`, used by `scripts/apply-orientation.sh` and `scripts/hdmi-power.sh`) fails with `XDG_RUNTIME_DIR is invalid or not set` unless the script derives it itself (`/run/user/$(id -u)`) and locates the actual `wayland-N` socket rather than assuming one is exported. This crash-looped `deskos-kiosk.service` in production before being fixed — see those two scripts for the pattern to follow for any future Wayland-native tooling.
 
 ## Code Style
 
 - TypeScript everywhere. No `any` unless unavoidable with a comment explaining why.
 - No credential, token, or secret in any committed file.
-- `localStorage` reads must validate shape before use — never blindly cast `JSON.parse` output.
+- `localStorage` reads must validate shape before use — never blindly cast `JSON.parse` output. Same rule applies to any backend file-based persistence (see `packages/backend/src/settings-store.ts`): a missing, unparseable, or wrong-shaped file falls back to a default rather than throwing.
 - Express SPA catch-all must stay last in `packages/backend/src/index.ts` and must exclude `/api/*`.
 - No comments explaining *what* the code does. Comments only for non-obvious *why*.
 
@@ -52,3 +57,7 @@ External epaper sites are embedded via iframe. If a site sends `X-Frame-Options:
 - **L-2**: Missing `aria-expanded` on expandable SidebarWidget header
 - **L-3**: No visible focus ring in sidebar CSS
 - **L-4**: Long JSX attribute line on `SidebarWidget.tsx:38`
+
+Bugs filed via the dev-framework's reviewer phase are tracked separately in
+`.dev-framework/bugs/bugs.json` (currently `BUG-001`, `BUG-002` — both low-severity, non-blocking,
+from the `additional-features` review). Check both places when looking for known open issues.

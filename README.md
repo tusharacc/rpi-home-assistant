@@ -87,7 +87,9 @@ sudo systemctl start deskos-kiosk
 - **Backend healthy but `/` 404s with a bare `Not Found` page**: the built frontend is missing or the backend can't find it. Confirm `dist/frontend/index.html` exists at the repo root (run `npm run build` from the repo root, not just the backend workspace) and that the file is readable by whichever user the systemd service runs as.
 - **`journalctl -u deskos-kiosk` full of D-Bus, GCM/phone-registration, Fontconfig, or VSync errors**: these are normal Chromium internal noise on a minimal kiosk session (no full session bus, no Play Services) — not the cause of a blank/unreachable page. Only investigate further if the kiosk fails to launch a window at all.
 - **`chromium-browser: command not found`**: expected on Bookworm/Trixie — the package is just `chromium`. `scripts/launch-kiosk.sh` already detects either name; if running Chromium manually, use `chromium` directly.
-- **Systemd services fail to start after cloning fresh**: re-run `./scripts/install-services.sh` — it templates `User=`/paths from the current user and repo location. Don't `cp` the `.service` files directly; they contain unresolved `__DESKOS_*__` placeholders.
+- **Systemd services fail to start after cloning fresh**: re-run `./scripts/install-services.sh` — it templates `User=`/paths from the current user and repo location, creates `packages/backend/data/`, and installs the shutdown sudoers rule. Don't `cp` the `.service` files directly; they contain unresolved `__DESKOS_*__` placeholders.
+- **`deskos-kiosk` crash-loops with `XDG_RUNTIME_DIR is invalid or not set` / `failed to connect to display`**: `scripts/apply-orientation.sh` and `scripts/hdmi-power.sh` use `wlr-randr`, a native Wayland client — unlike Chromium (which reaches the display fine via XWayland using `DISPLAY`/`XAUTHORITY`), it needs `XDG_RUNTIME_DIR`/`WAYLAND_DISPLAY`, which systemd services don't inherit from any graphical login session. Both scripts now derive these themselves; if you still see this error, confirm a `wayland-*` socket actually exists under `/run/user/<uid>` at boot (it depends on your Pi's auto-login mechanism creating a real login session).
+- **Orientation/standby buttons return `500` on the Pi**: confirm which Wayland compositor is running (`echo $XDG_CURRENT_DESKTOP`) — `apply-orientation.sh`/`hdmi-power.sh` assume `wlr-randr` (labwc); if you're on `wayfire` the command syntax may need adjusting.
 
 ## Plugin Architecture
 
@@ -103,7 +105,28 @@ Each application is a plugin registered in `packages/frontend/src/plugins/regist
 | News › The Hindu | Active | ePaper iframe (`epaper.thehindu.com`) |
 | News › LiveMint | Active | ePaper iframe (`epaper.livemint.com`) |
 | News › Other News | Placeholder | Coming next feature |
+| Settings | Active | System uptime, display orientation, Standby Now, Shut Down |
+| Investments | Placeholder | Coming later |
+| Home Automation | Placeholder | Coming later |
 | Raspberry Pi Desktop | Placeholder | Coming later |
+
+## Display, Power & Settings
+
+- **Orientation**: Portrait/Landscape buttons in Settings rotate the whole kiosk output (not just
+  a CSS reflow) via the Wayland compositor, and persist across reboot in
+  `packages/backend/data/settings.json`.
+- **Standby**: auto-triggers after 10 minutes of no touch/mouse input (never on keyboard input —
+  this device has none in normal use), or immediately via the "Standby Now" button. Blanks the
+  display, keeps Wi-Fi and the backend alive, wakes instantly on touch/mouse activity.
+- **Shutdown**: the "Shut Down" button shows "Safe to switch off power." and runs a real shutdown,
+  via a passwordless `sudo` rule scoped to exactly that one command (installed by
+  `install-services.sh`, never a broad sudo grant).
+- **Lightweight Mode**: an optional, one-time setup script (`scripts/lightweight-mode.sh`) that
+  disables Bluetooth and a few unnecessary default desktop services, leaving Wi-Fi untouched. Not
+  run automatically — run it manually once if you want it:
+  ```bash
+  ./scripts/lightweight-mode.sh
+  ```
 
 ## UI Theme
 
