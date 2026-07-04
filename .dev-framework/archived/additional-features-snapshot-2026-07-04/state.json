@@ -4,8 +4,7 @@
   "workflowType": "full",
   "created": "2026-07-04T13:14:24Z",
   "currentPhase": "complete",
-  "status": "archived",
-  "archivedDate": "2026-07-04T14:03:47Z",
+  "status": "active",
   "branch": "feature/additional-features",
   "roles": {
     "po": { "status": "complete", "completed": "2026-07-04T13:22:46Z" },
