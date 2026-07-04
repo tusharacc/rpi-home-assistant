@@ -1,0 +1,49 @@
+{
+  "name": "additional-features",
+  "type": "feature",
+  "workflowType": "full",
+  "created": "2026-07-04T13:14:24Z",
+  "currentPhase": "complete",
+  "status": "active",
+  "branch": "feature/additional-features",
+  "roles": {
+    "po": { "status": "complete", "completed": "2026-07-04T13:22:46Z" },
+    "architect": { "status": "complete", "completed": "2026-07-04T13:25:25Z" },
+    "developer": { "status": "complete", "completed": "2026-07-04T13:45:30Z" },
+    "reviewer": { "status": "complete", "completed": "2026-07-04T13:47:21Z" },
+    "tester": { "status": "complete", "completed": "2026-07-04T13:49:55Z" },
+    "executor": { "status": "complete", "completed": "2026-07-04T13:54:16Z" },
+    "po-approval": { "status": "complete", "completed": "2026-07-04T13:55:34Z" }
+  },
+  "artifacts": {
+    "po": "artifacts/additional-features.po.md",
+    "architect": "artifacts/additional-features.architect.md",
+    "developer": "artifacts/additional-features.developer.md",
+    "reviewer": "artifacts/additional-features.reviewer.md",
+    "code-quality-report": "artifacts/additional-features.code-quality-report.md",
+    "tester": "artifacts/additional-features.tester.md",
+    "executor": "artifacts/additional-features.executor.md",
+    "po-approval": "artifacts/additional-features.po-approval.md",
+    "complete": "artifacts/additional-features.complete.md"
+  },
+  "timelines": {
+    "po_complete": "2026-07-04T13:22:46Z",
+    "architect_start": "2026-07-04T13:22:46Z",
+    "architect_complete": "2026-07-04T13:25:25Z",
+    "developer_start": "2026-07-04T13:25:25Z",
+    "developer_complete": "2026-07-04T13:40:13Z",
+    "reviewer_start": "2026-07-04T13:40:13Z",
+    "reviewer_blocked": "2026-07-04T13:42:51Z",
+    "developer_start_2": "2026-07-04T13:42:51Z",
+    "developer_complete_2": "2026-07-04T13:45:30Z",
+    "reviewer_start_2": "2026-07-04T13:45:30Z",
+    "reviewer_complete": "2026-07-04T13:47:21Z",
+    "tester_start": "2026-07-04T13:47:21Z",
+    "tester_complete": "2026-07-04T13:49:55Z",
+    "executor_start": "2026-07-04T13:49:55Z",
+    "executor_complete": "2026-07-04T13:54:16Z",
+    "po-approval_start": "2026-07-04T13:54:16Z",
+    "po-approval_complete": "2026-07-04T13:55:34Z",
+    "complete_start": "2026-07-04T13:55:34Z"
+  }
+}

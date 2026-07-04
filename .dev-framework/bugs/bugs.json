@@ -1,0 +1,20 @@
+{
+  "bugs": [
+    {
+      "id": "BUG-001",
+      "title": "Duplicate placeholder-panel shape across three plugins",
+      "severity": "low",
+      "status": "open",
+      "created": "2026-07-04T13:46:56Z",
+      "workspace": "additional-features"
+    },
+    {
+      "id": "BUG-002",
+      "title": "Unnecessary nested parens in SettingsPlugin's isSettingsResponse guard",
+      "severity": "low",
+      "status": "open",
+      "created": "2026-07-04T13:46:56Z",
+      "workspace": "additional-features"
+    }
+  ]
+}
