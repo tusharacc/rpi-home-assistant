@@ -41,7 +41,7 @@ DeskOS is a Raspberry Pi personal information appliance. It's a full-screen kios
 
 ## iframe Embedding
 
-External epaper sites are embedded via iframe. If a site sends `X-Frame-Options: SAMEORIGIN`, the backend proxy approach (stripping that header) is the preferred workaround — not `--disable-web-security` on Chromium.
+External epaper sites are embedded via iframe. If a site sends `X-Frame-Options: SAMEORIGIN`, use `--disable-web-security` on Chromium — not a backend proxy. A backend proxy was evaluated and rejected: the proxy fetch runs on the Pi, not in the authenticated browser, so it can't forward the Google SSO session cookie that lives in the Chromium persistent profile, and it can only cover the initial page load — any in-reader navigation would hit the same block again. `--disable-web-security` is acceptable here because DeskOS is a single-purpose personal appliance, not a shared or general-purpose browser.
 
 ## Open Low-Severity Bugs
 

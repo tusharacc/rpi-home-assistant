@@ -18,6 +18,7 @@ xset -dpms
 
 "${CHROMIUM_BIN}" \
   --kiosk \
+  --disable-web-security \
   --user-data-dir="${CHROMIUM_PROFILE}" \
   --no-first-run \
   --disable-default-apps \

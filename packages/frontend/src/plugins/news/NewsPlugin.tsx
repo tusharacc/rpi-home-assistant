@@ -14,7 +14,7 @@ export const newsPlugin: Plugin = {
       finePrint: 'ePaper Edition',
       icon: <BookOpen size={14} />,
       contentMode: 'iframe',
-      iframeSrc: '/api/proxy/epaper/thehindu',
+      iframeSrc: 'https://epaper.thehindu.com',
     },
     {
       id: 'news-livemint',
@@ -22,7 +22,7 @@ export const newsPlugin: Plugin = {
       finePrint: 'ePaper Edition',
       icon: <BookOpen size={14} />,
       contentMode: 'iframe',
-      iframeSrc: '/api/proxy/epaper/livemint',
+      iframeSrc: 'https://epaper.livemint.com',
     },
     {
       id: 'news-other',
