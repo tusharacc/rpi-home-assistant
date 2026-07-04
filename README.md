@@ -71,8 +71,8 @@ chromium-browser --user-data-dir="$CHROMIUM_PROFILE" http://localhost:3000
 sudo systemctl start deskos-kiosk
 ```
 
-> **Why `--disable-web-security`?**  
-> The Hindu and LiveMint epaper sites send `X-Frame-Options: SAMEORIGIN`, which prevents browsers from embedding them in iframes from a different origin (localhost). The kiosk launch script includes `--disable-web-security` to bypass this restriction. This is appropriate for a single-purpose personal appliance running a trusted local app — it is not a shared or general-purpose browser.
+> **iframe embedding**  
+> The Hindu and LiveMint epaper sites may send frame-blocking headers (`X-Frame-Options` / CSP `frame-ancestors`) that prevent embedding in an iframe from a different origin. Instead of disabling Chromium's web security, the backend proxies the epaper shell page server-side at `/api/proxy/epaper/:site` and re-serves it without those headers (see `packages/backend/src/index.ts`). The frontend `iframeSrc` points at this proxy route rather than the external URL directly.
 
 > **Session expiry**: Google SSO sessions occasionally expire. If an epaper shows a login page instead of content, reconnect a keyboard and repeat step 4 above.
 
