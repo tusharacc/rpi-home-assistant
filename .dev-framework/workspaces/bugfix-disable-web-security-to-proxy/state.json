@@ -1,0 +1,27 @@
+{
+  "name": "bugfix-disable-web-security-to-proxy",
+  "type": "bugfix",
+  "workflowType": "bugfix",
+  "bugId": "Replace --disable-web-security in Chromium kiosk launch with the backend proxy approach for embedding The Hindu / LiveMint epaper iframes (strip X-Frame-Options / adjust CSP on proxied responses), per CLAUDE.md's iframe embedding policy.",
+  "created": "2026-07-04T00:00:00Z",
+  "currentPhase": "developer",
+  "status": "active",
+  "branch": "bugfix/bugfix-disable-web-security-to-proxy",
+  "roles": {
+    "developer": { "status": "in-progress", "completed": null },
+    "reviewer": { "status": "pending", "completed": null },
+    "tester": { "status": "pending", "completed": null },
+    "executor": { "status": "pending", "completed": null },
+    "po-approval": { "status": "pending", "completed": null }
+  },
+  "artifacts": {
+    "developer": "artifacts/bugfix-disable-web-security-to-proxy.developer.md",
+    "reviewer": null,
+    "tester": null,
+    "executor": null,
+    "po-approval": null
+  },
+  "timelines": {
+    "developer_start": "2026-07-04T00:00:00Z"
+  }
+}
