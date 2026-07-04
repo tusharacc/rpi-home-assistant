@@ -14,6 +14,20 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SETTINGS_FILE="${SCRIPT_DIR}/../packages/backend/data/settings.json"
 
+# systemd's ExecStartPre doesn't inherit the graphical session's environment,
+# so wlr-randr (a native Wayland client, unlike Chromium which runs under
+# XWayland via DISPLAY=:0) needs these discovered explicitly rather than
+# assumed set — same class of issue as the earlier X11 DISPLAY/XAUTHORITY
+# problem, for the Wayland side this time.
+export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+if [[ -z "${WAYLAND_DISPLAY:-}" ]]; then
+  export WAYLAND_DISPLAY="$(ls -1 "${XDG_RUNTIME_DIR}" 2>/dev/null | grep -E '^wayland-[0-9]+$' | head -n1)"
+fi
+if [[ -z "${WAYLAND_DISPLAY:-}" ]]; then
+  echo "ERROR: no Wayland display socket found in ${XDG_RUNTIME_DIR}" >&2
+  exit 1
+fi
+
 ORIENTATION="${1:-}"
 if [[ -z "$ORIENTATION" ]]; then
   if [[ -f "$SETTINGS_FILE" ]]; then
