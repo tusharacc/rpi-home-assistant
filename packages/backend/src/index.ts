@@ -1,5 +1,8 @@
 import express from 'express'
 import path from 'path'
+import { settingsRouter } from './routes/settings'
+import { standbyRouter } from './routes/standby'
+import { systemRouter } from './routes/system'
 
 const app = express()
 const PORT = process.env.PORT ?? 3001
@@ -10,6 +13,10 @@ app.use(express.json())
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', version: '0.1.0' })
 })
+
+app.use('/api', settingsRouter)
+app.use('/api', standbyRouter)
+app.use('/api', systemRouter)
 
 app.use(express.static(FRONTEND_DIST))
 

@@ -10,6 +10,7 @@ User=__DESKOS_USER__
 Environment=DISPLAY=:0
 Environment=XAUTHORITY=__DESKOS_HOME__/.Xauthority
 ExecStartPre=/bin/sleep 3
+ExecStartPre=__DESKOS_REPO_DIR__/scripts/apply-orientation.sh
 ExecStart=__DESKOS_REPO_DIR__/scripts/launch-kiosk.sh
 Restart=on-failure
 RestartSec=5
