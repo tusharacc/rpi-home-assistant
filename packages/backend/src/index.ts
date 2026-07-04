@@ -5,7 +5,7 @@ import { standbyRouter } from './routes/standby'
 import { systemRouter } from './routes/system'
 
 const app = express()
-const PORT = process.env.PORT ?? 3001
+const PORT = Number(process.env.PORT ?? 3001)
 const FRONTEND_DIST = path.join(__dirname, '../../../dist/frontend')
 
 app.use(express.json())
@@ -25,6 +25,10 @@ app.get(/^(?!\/api).*$/, (_req, res) => {
   res.sendFile(path.join(FRONTEND_DIST, 'index.html'))
 })
 
-app.listen(PORT, () => {
+// Bound to loopback only — the kiosk and the Vite dev proxy both reach this
+// via localhost, and this is now the first PR with mutating routes
+// (settings/rotate/standby/shutdown), so it must not be reachable from the
+// rest of the LAN.
+app.listen(PORT, '127.0.0.1', () => {
   console.log(`DeskOS backend running on http://localhost:${PORT}`)
 })

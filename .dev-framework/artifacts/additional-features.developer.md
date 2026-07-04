@@ -1,7 +1,27 @@
 # Developer Implementation: additional-features
 
-**Status**: Ready for Reviewer
+**Status**: Ready for Reviewer (round 2 — see Round 2 Fix below)
 **Based on**: `artifacts/additional-features.architect.md`
+
+## Round 2 Fix (code-quality BLOCKED → resolved)
+
+First reviewer pass ran the `code-quality` gate and it **BLOCKED** on one HIGH finding (SC-04):
+the five new mutating routes (`PUT /api/settings`, `POST /api/settings/rotate`,
+`POST /api/standby/enter|exit`, `POST /api/system/shutdown`) have no auth, and
+`packages/backend/src/index.ts`'s `app.listen(PORT, ...)` binds to all interfaces (`0.0.0.0`) —
+meaning any device on the same Wi-Fi network as the Pi could call them with zero credentials
+(e.g. remotely shutting the appliance down). Full finding in
+`artifacts/additional-features.code-quality-report.md`.
+
+**Fix applied**: `packages/backend/src/index.ts` now binds explicitly to loopback —
+`app.listen(PORT, '127.0.0.1', () => {...})` — and `PORT` is coerced to `Number(...)` (required
+for the hostname-argument overload to type-check). Verified post-fix: rebuilt cleanly, started the
+compiled backend standalone, and confirmed via `lsof` that it listens on `127.0.0.1:<port>` only
+(not `0.0.0.0`), while `/api/health` and `/api/settings` still respond correctly over loopback —
+matching how both the Vite dev proxy and the production kiosk already reach the backend (via
+`localhost`), so this closes the LAN exposure without changing any documented access path or
+requiring an auth layer (which would conflict with the device's no-keyboard/no-credential-entry
+constraint anyway).
 
 ## Implementation Plan
 
