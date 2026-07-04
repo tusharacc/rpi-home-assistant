@@ -3,14 +3,14 @@
   "type": "feature",
   "workflowType": "full",
   "created": "2026-07-04T13:14:24Z",
-  "currentPhase": "developer",
+  "currentPhase": "reviewer",
   "status": "active",
   "branch": "feature/additional-features",
   "roles": {
     "po": { "status": "complete", "completed": "2026-07-04T13:22:46Z" },
     "architect": { "status": "complete", "completed": "2026-07-04T13:25:25Z" },
-    "developer": { "status": "in-progress", "completed": null },
-    "reviewer": { "status": "pending", "completed": null },
+    "developer": { "status": "complete", "completed": "2026-07-04T13:40:13Z" },
+    "reviewer": { "status": "in-progress", "completed": null },
     "tester": { "status": "pending", "completed": null },
     "executor": { "status": "pending", "completed": null },
     "po-approval": { "status": "pending", "completed": null }
@@ -19,7 +19,7 @@
     "po": "artifacts/additional-features.po.md",
     "architect": "artifacts/additional-features.architect.md",
     "developer": "artifacts/additional-features.developer.md",
-    "reviewer": null,
+    "reviewer": "artifacts/additional-features.reviewer.md",
     "tester": null,
     "executor": null,
     "po-approval": null
@@ -28,6 +28,8 @@
     "po_complete": "2026-07-04T13:22:46Z",
     "architect_start": "2026-07-04T13:22:46Z",
     "architect_complete": "2026-07-04T13:25:25Z",
-    "developer_start": "2026-07-04T13:25:25Z"
+    "developer_start": "2026-07-04T13:25:25Z",
+    "developer_complete": "2026-07-04T13:40:13Z",
+    "reviewer_start": "2026-07-04T13:40:13Z"
   }
 }
