@@ -6,7 +6,7 @@ import { computeExpiresAt, radarExpiresAt } from '../../news/freshness'
 import { discoverFromTavily } from './discover/tavily'
 import { discoverFromRss } from './discover/rss'
 import { discoverFromArxiv } from './discover/arxiv'
-import { discoverFromPapersWithCode } from './discover/paperswithcode'
+import { discoverFromHuggingFacePapers } from './discover/huggingface-papers'
 import { discoverFromHackerNews } from './discover/hackernews'
 import { discoverFromReddit } from './discover/reddit'
 import { discoverFromGitHub } from './discover/github'
@@ -27,7 +27,7 @@ async function run(): Promise<void> {
       discoverFromTavily(process.env.TAVILY_API_KEY),
       discoverFromRss(),
       discoverFromArxiv(),
-      discoverFromPapersWithCode(),
+      discoverFromHuggingFacePapers(),
       discoverFromHackerNews(),
       discoverFromReddit(),
     ])

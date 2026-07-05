@@ -2,7 +2,7 @@ import Parser from 'rss-parser'
 import type { DiscoveredArticle } from '../../../news/types'
 import { RSS_FEEDS } from '../../../news/config'
 
-const parser = new Parser()
+const parser = new Parser({ timeout: 15_000 })
 
 export async function discoverFromRss(): Promise<DiscoveredArticle[]> {
   const now = new Date().toISOString()

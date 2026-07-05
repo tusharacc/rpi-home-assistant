@@ -1,7 +1,7 @@
 import Parser from 'rss-parser'
 import type { DiscoveredArticle } from '../../../news/types'
 
-const parser = new Parser()
+const parser = new Parser({ timeout: 15_000 })
 
 const ARXIV_QUERY =
   'http://export.arxiv.org/api/query?search_query=cat:cs.AI+OR+cat:cs.CL+OR+cat:cs.LG' +

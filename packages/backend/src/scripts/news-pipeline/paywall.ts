@@ -16,7 +16,6 @@ const FREE_DOMAINS = [
   'arxiv.org',
   'github.com',
   'reddit.com',
-  'paperswithcode.com',
   'news.ycombinator.com',
 ]
 

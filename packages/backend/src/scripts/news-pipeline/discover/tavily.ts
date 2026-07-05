@@ -1,5 +1,6 @@
 import type { DiscoveredArticle } from '../../../news/types'
 import { TAVILY_TOPICS } from '../../../news/config'
+import { fetchWithTimeout } from '../../../news/fetch-with-timeout'
 
 interface TavilyResult {
   title: string
@@ -22,7 +23,7 @@ export async function discoverFromTavily(apiKey: string | undefined): Promise<Di
 
   for (const topic of TAVILY_TOPICS) {
     try {
-      const res = await fetch('https://api.tavily.com/search', {
+      const res = await fetchWithTimeout('https://api.tavily.com/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

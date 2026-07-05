@@ -1,4 +1,5 @@
 import type { PaywallTagged } from './paywall'
+import { fetchWithTimeout } from '../../news/fetch-with-timeout'
 
 export interface Classified extends PaywallTagged {
   topic: string | null
@@ -30,7 +31,7 @@ ${list}`
 
 async function classifyBatch(batch: PaywallTagged[], apiKey: string, model: string): Promise<Classified[]> {
   try {
-    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    const res = await fetchWithTimeout('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -41,7 +42,7 @@ async function classifyBatch(batch: PaywallTagged[], apiKey: string, model: stri
         messages: [{ role: 'user', content: buildPrompt(batch) }],
         response_format: { type: 'json_object' },
       }),
-    })
+    }, 30_000)
 
     if (!res.ok) {
       console.warn(`[news-pipeline] classification request failed: ${res.status}`)

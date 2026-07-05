@@ -3,11 +3,8 @@ import type { Classified } from './classify'
 const SOURCE_REPUTATION: Record<string, number> = {
   tavily: 0.6,
   arxiv: 0.9,
-  paperswithcode: 0.85,
+  'huggingface-papers': 0.85,
   hackernews: 0.75,
-  'google-news:india-business': 0.65,
-  'google-news:world-tech': 0.65,
-  'google-news:ai-policy': 0.65,
 }
 
 function reputationFor(source: string): number {
@@ -31,7 +28,7 @@ export interface Ranked extends Classified {
 
 export function rankArticle(article: Classified): Ranked {
   const isOriginal =
-    article.mergedSources.length > 0 || article.source === 'arxiv' || article.source === 'paperswithcode'
+    article.mergedSources.length > 0 || article.source === 'arxiv' || article.source === 'huggingface-papers'
 
   const reputation = reputationFor(article.source)
   const freshness = freshnessScore(article.publishedAt)

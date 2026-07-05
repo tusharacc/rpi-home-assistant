@@ -1,5 +1,6 @@
 import type { DiscoveredRadarItem } from '../../../news/types'
 import { GITHUB_TOPICS } from '../../../news/config'
+import { fetchWithTimeout } from '../../../news/fetch-with-timeout'
 
 interface GhRepo {
   full_name: string
@@ -26,7 +27,7 @@ function authHeaders(): Record<string, string> {
 
 async function fetchLatestRelease(fullName: string): Promise<GhRelease | null> {
   try {
-    const res = await fetch(`https://api.github.com/repos/${fullName}/releases/latest`, {
+    const res = await fetchWithTimeout(`https://api.github.com/repos/${fullName}/releases/latest`, {
       headers: { Accept: 'application/vnd.github+json', ...authHeaders() },
     })
     if (!res.ok) return null
@@ -42,7 +43,7 @@ export async function discoverFromGitHub(): Promise<DiscoveredRadarItem[]> {
 
   for (const topic of GITHUB_TOPICS) {
     try {
-      const res = await fetch(
+      const res = await fetchWithTimeout(
         `https://api.github.com/search/repositories?q=topic:${encodeURIComponent(topic)}+pushed:>${since}&sort=stars&order=desc&per_page=5`,
         { headers: { Accept: 'application/vnd.github+json', ...authHeaders() } },
       )

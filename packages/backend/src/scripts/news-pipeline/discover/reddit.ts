@@ -1,5 +1,6 @@
 import type { Category, DiscoveredArticle } from '../../../news/types'
 import { REDDIT_COMMUNITIES } from '../../../news/config'
+import { fetchWithTimeout } from '../../../news/fetch-with-timeout'
 
 interface RedditPost {
   data: {
@@ -27,7 +28,7 @@ export async function discoverFromReddit(): Promise<DiscoveredArticle[]> {
 
   for (const sub of REDDIT_COMMUNITIES) {
     try {
-      const res = await fetch(`https://www.reddit.com/r/${sub}/top.json?limit=10&t=day`, {
+      const res = await fetchWithTimeout(`https://www.reddit.com/r/${sub}/top.json?limit=10&t=day`, {
         headers: { 'User-Agent': 'DeskOS-NewsPipeline/1.0' },
       })
       if (!res.ok) {
