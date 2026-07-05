@@ -1,5 +1,6 @@
 import { Newspaper, BookOpen, Globe } from 'lucide-react'
 import type { Plugin } from '../types'
+import { OtherNewsView } from './OtherNews/OtherNewsView'
 
 export const newsPlugin: Plugin = {
   id: 'news',
@@ -30,24 +31,7 @@ export const newsPlugin: Plugin = {
       finePrint: 'Aggregated Feed',
       icon: <Globe size={14} />,
       contentMode: 'react',
-      render: () => (
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '100%',
-          flexDirection: 'column',
-          gap: '10px',
-          fontFamily: 'var(--font-mono)',
-          color: 'var(--text-muted)',
-          fontSize: '0.72rem',
-          letterSpacing: '0.1em',
-          textTransform: 'uppercase',
-        }}>
-          <Globe size={28} strokeWidth={1} />
-          Aggregated news — coming next feature
-        </div>
-      ),
+      render: () => <OtherNewsView />,
     },
   ],
   render: () => null,

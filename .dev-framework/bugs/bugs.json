@@ -15,6 +15,22 @@
       "status": "open",
       "created": "2026-07-04T13:46:56Z",
       "workspace": "additional-features"
+    },
+    {
+      "id": "BUG-003",
+      "title": "News SourceMenu popover has no click-outside-to-close handler",
+      "severity": "low",
+      "status": "open",
+      "created": "2026-07-05T06:45:00Z",
+      "workspace": "news-intelligence"
+    },
+    {
+      "id": "BUG-004",
+      "title": "No manage-sources view — GET /api/news/sources exists but frontend never reads it, SourceMenu fires hide/follow blind",
+      "severity": "low",
+      "status": "open",
+      "created": "2026-07-05T06:45:00Z",
+      "workspace": "news-intelligence"
     }
   ]
 }

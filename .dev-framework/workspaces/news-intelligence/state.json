@@ -1,0 +1,28 @@
+{
+  "name": "news-intelligence",
+  "type": "feature",
+  "workflowType": "full",
+  "created": "2026-07-05T03:21:36Z",
+  "currentPhase": "complete",
+  "status": "active",
+  "branch": "feature/news-intelligence",
+  "roles": {
+    "po": { "status": "complete", "completed": "2026-07-05T04:10:00Z" },
+    "architect": { "status": "complete", "completed": "2026-07-05T04:40:00Z" },
+    "developer": { "status": "complete", "completed": "2026-07-05T06:30:00Z" },
+    "reviewer": { "status": "complete", "completed": "2026-07-05T06:50:00Z" },
+    "tester": { "status": "complete", "completed": "2026-07-05T10:30:00Z" },
+    "executor": { "status": "complete", "completed": "2026-07-05T10:45:00Z" },
+    "po-approval": { "status": "complete", "completed": "2026-07-05T10:50:00Z" }
+  },
+  "artifacts": {
+    "po": "artifacts/news-intelligence.po.md",
+    "architect": "artifacts/news-intelligence.architect.md",
+    "developer": "artifacts/news-intelligence.developer.md",
+    "reviewer": "artifacts/news-intelligence.reviewer.md",
+    "tester": "artifacts/news-intelligence.tester.md",
+    "executor": "artifacts/news-intelligence.executor.md",
+    "po-approval": "artifacts/news-intelligence.po-approval.md"
+  },
+  "timelines": {}
+}
