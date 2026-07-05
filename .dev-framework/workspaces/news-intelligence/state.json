@@ -8,7 +8,7 @@
   "branch": "feature/news-intelligence",
   "roles": {
     "po": { "status": "complete", "completed": "2026-07-05T04:10:00Z" },
-    "architect": { "status": "in-progress", "completed": null },
+    "architect": { "status": "complete", "completed": "2026-07-05T04:40:00Z" },
     "developer": { "status": "pending", "completed": null },
     "reviewer": { "status": "pending", "completed": null },
     "tester": { "status": "pending", "completed": null },
