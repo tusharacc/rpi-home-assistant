@@ -3,7 +3,7 @@
   "type": "feature",
   "workflowType": "full",
   "created": "2026-07-05T03:21:36Z",
-  "currentPhase": "executor",
+  "currentPhase": "po-approval",
   "status": "active",
   "branch": "feature/news-intelligence",
   "roles": {
@@ -12,8 +12,8 @@
     "developer": { "status": "complete", "completed": "2026-07-05T06:30:00Z" },
     "reviewer": { "status": "complete", "completed": "2026-07-05T06:50:00Z" },
     "tester": { "status": "complete", "completed": "2026-07-05T10:30:00Z" },
-    "executor": { "status": "in-progress", "completed": null },
-    "po-approval": { "status": "pending", "completed": null }
+    "executor": { "status": "complete", "completed": "2026-07-05T10:45:00Z" },
+    "po-approval": { "status": "in-progress", "completed": null }
   },
   "artifacts": {
     "po": "artifacts/news-intelligence.po.md",
@@ -22,7 +22,7 @@
     "reviewer": "artifacts/news-intelligence.reviewer.md",
     "tester": "artifacts/news-intelligence.tester.md",
     "executor": "artifacts/news-intelligence.executor.md",
-    "po-approval": null
+    "po-approval": "artifacts/news-intelligence.po-approval.md"
   },
   "timelines": {}
 }
