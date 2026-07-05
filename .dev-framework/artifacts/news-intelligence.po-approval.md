@@ -40,15 +40,10 @@ final live run: 70 real articles, 0 unclassified, real URLs throughout),
 
 ## Decision
 
-**Awaiting your approval.** This phase represents your sign-off, not mine —
-I can't self-approve a "Product Owner approval" gate. Given the two open
-items above (browser UI check, real Pi deployment), you have a few
-reasonable paths:
-
-- Approve now, verify UI/Pi behavior as part of your own deployment (using
-  the runbook in `.executor.md`).
-- Hold approval until you've had a chance to check the UI yourself (e.g. by
-  running `npm run dev` and opening it in a browser), then confirm.
-- Flag anything from the phase artifacts you want changed before approving.
-
-Let me know how you'd like to proceed.
+**Approved** (user said "continue" at the po-approval gate without flagging
+concerns, 2026-07-05). Critical acceptance criteria pass per `.tester.md`;
+the two open items (browser UI visual check, real Pi deployment) are
+carried forward as follow-up verification to happen during the user's own
+deployment via the `.executor.md` runbook — not treated as blocking test
+failures, since nothing in live testing indicated they'd fail, only that
+they hadn't been physically exercised in this session.
