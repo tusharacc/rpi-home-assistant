@@ -1,0 +1,28 @@
+{
+  "name": "news-intelligence",
+  "type": "feature",
+  "workflowType": "full",
+  "created": "2026-07-05T03:21:36Z",
+  "currentPhase": "po",
+  "status": "active",
+  "branch": "feature/news-intelligence",
+  "roles": {
+    "po": { "status": "in-progress", "completed": null },
+    "architect": { "status": "pending", "completed": null },
+    "developer": { "status": "pending", "completed": null },
+    "reviewer": { "status": "pending", "completed": null },
+    "tester": { "status": "pending", "completed": null },
+    "executor": { "status": "pending", "completed": null },
+    "po-approval": { "status": "pending", "completed": null }
+  },
+  "artifacts": {
+    "po": "artifacts/news-intelligence.po.md",
+    "architect": null,
+    "developer": null,
+    "reviewer": null,
+    "tester": null,
+    "executor": null,
+    "po-approval": null
+  },
+  "timelines": {}
+}
