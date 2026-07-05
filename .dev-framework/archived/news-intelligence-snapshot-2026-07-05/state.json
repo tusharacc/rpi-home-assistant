@@ -4,8 +4,7 @@
   "workflowType": "full",
   "created": "2026-07-05T03:21:36Z",
   "currentPhase": "complete",
-  "status": "archived",
-  "archivedDate": "2026-07-05T11:00:00Z",
+  "status": "active",
   "branch": "feature/news-intelligence",
   "roles": {
     "po": { "status": "complete", "completed": "2026-07-05T04:10:00Z" },
