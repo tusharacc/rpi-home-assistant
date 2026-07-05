@@ -19,17 +19,6 @@ export function useNewsQueue(mode: ReadingMode) {
   const [articles, setArticles] = useState<Article[]>([])
   const [loading, setLoading] = useState(true)
 
-  const reload = useCallback(() => {
-    setLoading(true)
-    fetch(`/api/news?mode=${mode}`)
-      .then((res) => res.json())
-      .then((data: unknown) => {
-        if (isQueueResponse(data)) setArticles(data.articles)
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false))
-  }, [mode])
-
   useEffect(() => {
     let cancelled = false
     setLoading(true)
@@ -54,5 +43,5 @@ export function useNewsQueue(mode: ReadingMode) {
     postArticleAction(id, action)
   }, [])
 
-  return { articles, loading, reload, applyAction }
+  return { articles, loading, applyAction }
 }

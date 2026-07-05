@@ -3,15 +3,15 @@
   "type": "feature",
   "workflowType": "full",
   "created": "2026-07-05T03:21:36Z",
-  "currentPhase": "reviewer",
+  "currentPhase": "tester",
   "status": "active",
   "branch": "feature/news-intelligence",
   "roles": {
     "po": { "status": "complete", "completed": "2026-07-05T04:10:00Z" },
     "architect": { "status": "complete", "completed": "2026-07-05T04:40:00Z" },
     "developer": { "status": "complete", "completed": "2026-07-05T06:30:00Z" },
-    "reviewer": { "status": "in-progress", "completed": null },
-    "tester": { "status": "pending", "completed": null },
+    "reviewer": { "status": "complete", "completed": "2026-07-05T06:50:00Z" },
+    "tester": { "status": "in-progress", "completed": null },
     "executor": { "status": "pending", "completed": null },
     "po-approval": { "status": "pending", "completed": null }
   },
@@ -20,7 +20,7 @@
     "architect": "artifacts/news-intelligence.architect.md",
     "developer": "artifacts/news-intelligence.developer.md",
     "reviewer": "artifacts/news-intelligence.reviewer.md",
-    "tester": null,
+    "tester": "artifacts/news-intelligence.tester.md",
     "executor": null,
     "po-approval": null
   },

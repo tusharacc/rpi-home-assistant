@@ -66,7 +66,7 @@ async function run(): Promise<void> {
   const radarItems = await discoverFromGitHub()
   for (const item of radarItems) {
     const discoveredAt = item.discoveredAt ?? new Date().toISOString()
-    upsertRadarItem(item, radarExpiresAt(discoveredAt))
+    upsertRadarItem({ ...item, discoveredAt }, radarExpiresAt(discoveredAt))
   }
   console.log(`[news-pipeline] upserted ${radarItems.length} radar items`)
 

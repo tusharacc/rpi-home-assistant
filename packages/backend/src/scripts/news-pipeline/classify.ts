@@ -17,12 +17,13 @@ const BATCH_SIZE = 10
 
 function buildPrompt(batch: PaywallTagged[]): string {
   const list = batch.map((a, i) => `${i}. ${a.title}`).join('\n')
-  return `For each numbered article title below, return a JSON array of objects with
-fields "index" (matching the number), "topic" (a short lowercase topic tag),
-"clickbaitScore" (0.0-1.0, how much the headline is sensationalized/clickbait),
-and "aiNoiseScore" (0.0-1.0, how much this looks like generic AI-generated or
+  return `For each numbered article title below, classify it and return a JSON object
+of the form {"results": [...]}, where each entry has fields "index" (matching
+the number), "topic" (a short lowercase topic tag), "clickbaitScore"
+(0.0-1.0, how much the headline is sensationalized/clickbait), and
+"aiNoiseScore" (0.0-1.0, how much this looks like generic AI-generated or
 AI-overexposed content rather than substantive original reporting).
-Return ONLY the JSON array, no other text.
+Return ONLY that JSON object, no other text.
 
 ${list}`
 }
