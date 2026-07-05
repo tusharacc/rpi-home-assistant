@@ -7,7 +7,7 @@ DESKOS_HOME="$HOME"
 
 mkdir -p "${REPO_DIR}/packages/backend/data"
 
-for unit in deskos-backend.service deskos-kiosk.service; do
+for unit in deskos-backend.service deskos-kiosk.service deskos-news-pipeline.service deskos-news-pipeline.timer; do
   sed \
     -e "s|__DESKOS_USER__|${DESKOS_USER}|g" \
     -e "s|__DESKOS_REPO_DIR__|${REPO_DIR}|g" \
@@ -18,6 +18,7 @@ done
 
 sudo systemctl daemon-reload
 sudo systemctl enable deskos-backend deskos-kiosk
+sudo systemctl enable --now deskos-news-pipeline.timer
 
 # Scoped passwordless shutdown — restricted to exactly this one command,
 # so the backend's "Shut Down" route can run it without a broad sudo grant.

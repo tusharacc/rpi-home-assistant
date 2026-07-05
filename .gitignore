@@ -3,4 +3,6 @@ dist/
 .DS_Store
 *.local
 packages/backend/data/*.json
+packages/backend/data/*.db
+packages/backend/data/*.db-*
 .env

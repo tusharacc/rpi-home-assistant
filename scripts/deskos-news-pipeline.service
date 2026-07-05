@@ -1,0 +1,11 @@
+[Unit]
+Description=DeskOS News Intelligence Pipeline
+After=network.target
+Wants=network.target
+
+[Service]
+Type=oneshot
+User=__DESKOS_USER__
+WorkingDirectory=__DESKOS_REPO_DIR__
+ExecStart=/usr/bin/node __DESKOS_REPO_DIR__/packages/backend/dist/scripts/news-pipeline/index.js
+Environment=NODE_ENV=production

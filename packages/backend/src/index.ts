@@ -3,6 +3,7 @@ import path from 'path'
 import { settingsRouter } from './routes/settings'
 import { standbyRouter } from './routes/standby'
 import { systemRouter } from './routes/system'
+import { newsRouter } from './routes/news'
 
 const app = express()
 const PORT = Number(process.env.PORT ?? 3001)
@@ -17,6 +18,7 @@ app.get('/api/health', (_req, res) => {
 app.use('/api', settingsRouter)
 app.use('/api', standbyRouter)
 app.use('/api', systemRouter)
+app.use('/api', newsRouter)
 
 app.use(express.static(FRONTEND_DIST))
 
