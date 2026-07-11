@@ -81,15 +81,49 @@ sudo systemctl start deskos-kiosk
 
 > **Session expiry**: Google SSO sessions occasionally expire. If an epaper shows a login page instead of content, reconnect a keyboard and repeat step 4 above.
 
+### Deploying Updates
+
+For pulling later changes onto an already-set-up Pi (not the one-time setup above):
+
+```bash
+# From your Mac, if .env or a locally-populated news.db need to travel with this
+# update (both are gitignored, so `git pull` alone won't carry them):
+scp .env <pi-user>@<pi-host>:<repo-path-on-pi>/.env
+scp packages/backend/data/news.db* <pi-user>@<pi-host>:<repo-path-on-pi>/packages/backend/data/   # only if a local db exists
+
+# On the Pi
+ssh <pi-user>@<pi-host>
+cd <repo-path-on-pi>
+git fetch && git checkout main && git pull
+npm install          # better-sqlite3 is a native module — must build on-device (ARM), not copied from macOS
+npm run build
+./scripts/install-services.sh    # idempotent; re-run any time a .service/.sudoers/.desktop file changes
+sudo systemctl restart deskos-backend
+sudo systemctl restart deskos-kiosk   # picks up frontend changes (e.g. the article reader modal)
+```
+
+`install-services.sh` is safe to re-run even when nothing changed — it re-templates and reinstalls
+every unit file, both sudoers rules, and the "Return to DeskOS" desktop icon idempotently. Always
+re-run it after pulling changes that touch anything under `scripts/*.service`, `scripts/*.sudoers`,
+or `scripts/*.desktop`, since those aren't picked up by `npm run build` alone.
+
+If the update includes news-pipeline changes and you want the reading queue populated immediately
+rather than waiting up to 3 days for the timer:
+```bash
+sudo systemctl start deskos-news-pipeline.service
+journalctl -u deskos-news-pipeline.service -f
+```
+
 ### Troubleshooting
 
 - **`localhost:3001` unreachable / kiosk shows "site cannot be reached"**: confirm the backend is actually up (`curl http://localhost:3001/api/health`) and that `scripts/launch-kiosk.sh`'s `DESKOS_URL` points at `3001`, not `3000` (`3000` is the dev-only Vite port — nothing listens there in production).
 - **Backend healthy but `/` 404s with a bare `Not Found` page**: the built frontend is missing or the backend can't find it. Confirm `dist/frontend/index.html` exists at the repo root (run `npm run build` from the repo root, not just the backend workspace) and that the file is readable by whichever user the systemd service runs as.
 - **`journalctl -u deskos-kiosk` full of D-Bus, GCM/phone-registration, Fontconfig, or VSync errors**: these are normal Chromium internal noise on a minimal kiosk session (no full session bus, no Play Services) — not the cause of a blank/unreachable page. Only investigate further if the kiosk fails to launch a window at all.
 - **`chromium-browser: command not found`**: expected on Bookworm/Trixie — the package is just `chromium`. `scripts/launch-kiosk.sh` already detects either name; if running Chromium manually, use `chromium` directly.
-- **Systemd services fail to start after cloning fresh**: re-run `./scripts/install-services.sh` — it templates `User=`/paths from the current user and repo location, creates `packages/backend/data/`, and installs the shutdown sudoers rule. Don't `cp` the `.service` files directly; they contain unresolved `__DESKOS_*__` placeholders.
+- **Systemd services fail to start after cloning fresh**: re-run `./scripts/install-services.sh` — it templates `User=`/paths from the current user and repo location, creates `packages/backend/data/`, and installs the shutdown and kiosk-control sudoers rules. Don't `cp` the `.service` files directly; they contain unresolved `__DESKOS_*__` placeholders.
 - **`deskos-kiosk` crash-loops with `XDG_RUNTIME_DIR is invalid or not set` / `failed to connect to display`**: `scripts/apply-orientation.sh` and `scripts/hdmi-power.sh` use `wlr-randr`, a native Wayland client — unlike Chromium (which reaches the display fine via XWayland using `DISPLAY`/`XAUTHORITY`), it needs `XDG_RUNTIME_DIR`/`WAYLAND_DISPLAY`, which systemd services don't inherit from any graphical login session. Both scripts now derive these themselves; if you still see this error, confirm a `wayland-*` socket actually exists under `/run/user/<uid>` at boot (it depends on your Pi's auto-login mechanism creating a real login session).
-- **Orientation/standby buttons return `500` on the Pi**: confirm which Wayland compositor is running (`echo $XDG_CURRENT_DESKTOP`) — `apply-orientation.sh`/`hdmi-power.sh` assume `wlr-randr` (labwc); if you're on `wayfire` the command syntax may need adjusting.
+- **Orientation button returns `500` on the Pi**: confirm which Wayland compositor is running (`echo $XDG_CURRENT_DESKTOP`) — `apply-orientation.sh`/`hdmi-power.sh` assume `wlr-randr` (labwc); if you're on `wayfire` the command syntax may need adjusting. (Standby is currently disabled in the UI — see "Display, Power & Settings" — so it can no longer trigger this.)
+- **"Return to DeskOS" desktop icon doesn't appear, or "Exit to Desktop" returns `500`**: re-run `./scripts/install-services.sh` — it installs both the `deskos-kiosk-control` sudoers rule and the desktop icon, and is safe to re-run on an existing install.
 
 ## Plugin Architecture
 
@@ -104,8 +138,8 @@ Each application is a plugin registered in `packages/frontend/src/plugins/regist
 |--------|--------|---------|
 | News › The Hindu | Active | ePaper iframe (`epaper.thehindu.com`) |
 | News › LiveMint | Active | ePaper iframe (`epaper.livemint.com`) |
-| News › Other News | Placeholder | Coming next feature |
-| Settings | Active | System uptime, display orientation, Standby Now, Shut Down |
+| News › Other News | Active | News Intelligence reading queue (Balanced/Engineering/AI Focus modes, Queue/Radar tabs), articles open in an in-app reader instead of a new window |
+| Settings | Active | System uptime, display orientation, Shut Down, Exit to Desktop (Standby Now temporarily disabled — see below) |
 | Investments | Placeholder | Coming later |
 | Home Automation | Placeholder | Coming later |
 | Raspberry Pi Desktop | Placeholder | Coming later |
@@ -115,9 +149,23 @@ Each application is a plugin registered in `packages/frontend/src/plugins/regist
 - **Orientation**: Portrait/Landscape buttons in Settings rotate the whole kiosk output (not just
   a CSS reflow) via the Wayland compositor, and persist across reboot in
   `packages/backend/data/settings.json`.
-- **Standby**: auto-triggers after 10 minutes of no touch/mouse input (never on keyboard input —
-  this device has none in normal use), or immediately via the "Standby Now" button. Blanks the
-  display, keeps Wi-Fi and the backend alive, wakes instantly on touch/mouse activity.
+- **Standby (currently disabled)**: both the 10-minute idle auto-trigger and the manual "Standby
+  Now" button are disabled in the frontend (`STANDBY_ENABLED = false` in
+  `packages/frontend/src/lib/idle-monitor.ts`). Root cause: `scripts/hdmi-power.sh` turns the
+  display off via `wlr-randr --output X --off`, which fully removes the output from the Wayland
+  compositor's layout rather than doing a DPMS-style blank. Once the sole output is disabled, the
+  compositor has nothing to hit-test the pointer against, so it stops delivering
+  `pointermove`/`pointerdown`/`touchstart` events entirely — the exact events the wake logic
+  depends on — leaving the display stuck off with no way to wake it (no keyboard to fall back to).
+  This locked the physical device twice before being found. Re-enable only after `hdmi-power.sh`
+  is switched to a true DPMS blank (e.g. `wlopm`/`wlr-output-power-management-v1`, if the
+  compositor supports it) that keeps the output in the layout and input flowing.
+- **Exit to Desktop**: the "Exit to Desktop" button stops `deskos-kiosk.service` (a clean
+  `systemctl stop`, so `Restart=on-failure` does not relaunch it), revealing the underlying RPi
+  desktop for maintenance — no SSH needed. To come back, double-click the "Return to DeskOS" icon
+  on the RPi desktop (installed by `install-services.sh` to `~/Desktop/`), which starts the kiosk
+  service back up. Both directions run via a passwordless `sudo` rule scoped to exactly
+  `systemctl stop/start deskos-kiosk.service` (`scripts/deskos-kiosk-control.sudoers`).
 - **Shutdown**: the "Shut Down" button shows "Safe to switch off power." and runs a real shutdown,
   via a passwordless `sudo` rule scoped to exactly that one command (installed by
   `install-services.sh`, never a broad sudo grant).
