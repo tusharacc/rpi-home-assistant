@@ -48,9 +48,9 @@ const repoMetaStyle: React.CSSProperties = {
   whiteSpace: 'nowrap',
 }
 
-function RepoRow({ item }: { item: RadarItem }) {
+function RepoRow({ item, onOpenArticle }: { item: RadarItem; onOpenArticle: (url: string) => void }) {
   return (
-    <a href={item.url} target="_blank" rel="noreferrer" style={repoRowStyle}>
+    <button style={{ ...repoRowStyle, width: '100%', background: 'transparent', border: 'none', cursor: 'pointer', font: 'inherit', textAlign: 'left' }} onClick={() => onOpenArticle(item.url)}>
       <div style={{ minWidth: 0 }}>
         <div style={{ fontSize: '0.85rem' }}>{item.repoFullName}</div>
         {item.description && (
@@ -80,7 +80,7 @@ function RepoRow({ item }: { item: RadarItem }) {
         )}
         <ExternalLink size={14} />
       </div>
-    </a>
+    </button>
   )
 }
 
@@ -98,7 +98,7 @@ const emptyStateStyle: React.CSSProperties = {
   textTransform: 'uppercase',
 }
 
-export function EngineeringRadar() {
+export function EngineeringRadar({ onOpenArticle }: { onOpenArticle: (url: string) => void }) {
   const [data, setData] = useState<RadarResponse | null>(null)
 
   useEffect(() => {
@@ -138,7 +138,11 @@ export function EngineeringRadar() {
         <>
           <div style={sectionHeadingStyle}>Trending Repos &amp; Releases</div>
           {data.repos.map((item) => (
-            <RepoRow key={`${item.kind}-${item.repoFullName}-${item.releaseTag ?? ''}`} item={item} />
+            <RepoRow
+              key={`${item.kind}-${item.repoFullName}-${item.releaseTag ?? ''}`}
+              item={item}
+              onOpenArticle={onOpenArticle}
+            />
           ))}
         </>
       )}
@@ -146,7 +150,7 @@ export function EngineeringRadar() {
         <>
           <div style={sectionHeadingStyle}>Papers &amp; Engineering Blogs</div>
           {data.articles.map((article) => (
-            <ArticleCard key={article.id} article={article} onAction={applyAction} />
+            <ArticleCard key={article.id} article={article} onAction={applyAction} onOpenArticle={onOpenArticle} />
           ))}
         </>
       )}

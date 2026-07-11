@@ -5,6 +5,7 @@ import { SourceMenu } from './SourceMenu'
 interface ArticleCardProps {
   article: Article
   onAction: (id: number, action: 'save' | 'ignore' | 'read') => void
+  onOpenArticle: (url: string) => void
 }
 
 const cardStyle: React.CSSProperties = {
@@ -71,7 +72,7 @@ function paywallLabel(status: Article['paywallStatus']): string | null {
   return null
 }
 
-export function ArticleCard({ article, onAction }: ArticleCardProps) {
+export function ArticleCard({ article, onAction, onOpenArticle }: ArticleCardProps) {
   const paywall = paywallLabel(article.paywallStatus)
 
   return (
@@ -105,15 +106,13 @@ export function ArticleCard({ article, onAction }: ArticleCardProps) {
         <button style={actionButtonStyle} onClick={() => onAction(article.id, 'ignore')} aria-label="Ignore">
           <X size={16} />
         </button>
-        <a
-          style={{ ...actionButtonStyle, textDecoration: 'none', marginLeft: 'auto' }}
-          href={article.url}
-          target="_blank"
-          rel="noreferrer"
+        <button
+          style={{ ...actionButtonStyle, marginLeft: 'auto' }}
+          onClick={() => onOpenArticle(article.url)}
           aria-label="Open original"
         >
           <ExternalLink size={16} />
-        </a>
+        </button>
       </div>
     </div>
   )

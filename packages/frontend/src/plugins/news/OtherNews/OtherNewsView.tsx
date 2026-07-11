@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { ReadingMode } from './types'
 import { ReadingQueue } from './ReadingQueue'
 import { EngineeringRadar } from './EngineeringRadar'
+import { ArticleReaderModal } from './ArticleReaderModal'
 
 type Tab = 'queue' | 'radar'
 
@@ -56,6 +57,7 @@ const MODES: { value: ReadingMode; label: string }[] = [
 export function OtherNewsView() {
   const [mode, setMode] = useState<ReadingMode>('balanced')
   const [tab, setTab] = useState<Tab>('queue')
+  const [readerUrl, setReaderUrl] = useState<string | null>(null)
 
   return (
     <div style={containerStyle}>
@@ -82,8 +84,13 @@ export function OtherNewsView() {
         </div>
       </div>
       <div style={scrollAreaStyle}>
-        {tab === 'queue' ? <ReadingQueue mode={mode} /> : <EngineeringRadar />}
+        {tab === 'queue' ? (
+          <ReadingQueue mode={mode} onOpenArticle={setReaderUrl} />
+        ) : (
+          <EngineeringRadar onOpenArticle={setReaderUrl} />
+        )}
       </div>
+      {readerUrl && <ArticleReaderModal url={readerUrl} onClose={() => setReaderUrl(null)} />}
     </div>
   )
 }

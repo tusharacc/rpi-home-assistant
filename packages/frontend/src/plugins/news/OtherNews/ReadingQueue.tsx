@@ -17,7 +17,12 @@ const emptyStateStyle: React.CSSProperties = {
   textTransform: 'uppercase',
 }
 
-export function ReadingQueue({ mode }: { mode: ReadingMode }) {
+interface ReadingQueueProps {
+  mode: ReadingMode
+  onOpenArticle: (url: string) => void
+}
+
+export function ReadingQueue({ mode, onOpenArticle }: ReadingQueueProps) {
   const { articles, loading, applyAction } = useNewsQueue(mode)
 
   if (!loading && articles.length === 0) {
@@ -32,7 +37,7 @@ export function ReadingQueue({ mode }: { mode: ReadingMode }) {
   return (
     <div>
       {articles.map((article) => (
-        <ArticleCard key={article.id} article={article} onAction={applyAction} />
+        <ArticleCard key={article.id} article={article} onAction={applyAction} onOpenArticle={onOpenArticle} />
       ))}
     </div>
   )
