@@ -3,6 +3,14 @@ import { useEffect, useRef } from 'react'
 const IDLE_TIMEOUT_MS = 10 * 60 * 1000
 const ACTIVITY_THROTTLE_MS = 250
 
+// Standby is disabled until hdmi-power.sh switches from wlr-randr --off (a full
+// output disable) to a DPMS-style blank: once the sole output is disabled, the
+// compositor has nothing to hit-test the cursor against, so it stops delivering
+// pointer/touch events at all — the wake-on-touch listeners below never fire,
+// and with no keyboard there is no way to recover the display. Locked the
+// kiosk twice before this was found; leave off until the wake path is fixed.
+const STANDBY_ENABLED = false
+
 let manualStandbyTrigger: (() => void) | null = null
 
 /** Used by the Settings screen's "Standby Now" button — shares state with the
@@ -18,7 +26,7 @@ export function IdleMonitor(): null {
 
   useEffect(() => {
     const enterStandby = () => {
-      if (isStandby.current) return
+      if (!STANDBY_ENABLED || isStandby.current) return
       isStandby.current = true
       fetch('/api/standby/enter', { method: 'POST' }).catch(() => {})
     }

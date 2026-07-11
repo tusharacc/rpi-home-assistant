@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Return to DeskOS
+Comment=Relaunch the DeskOS kiosk
+Exec=__DESKOS_REPO_DIR__/scripts/return-to-kiosk.sh
+Icon=video-display
+Terminal=false
+Categories=Utility;

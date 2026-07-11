@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Settings as SettingsIcon, RectangleVertical, RectangleHorizontal, Moon, Power } from 'lucide-react'
+import { Settings as SettingsIcon, RectangleVertical, RectangleHorizontal, Moon, Power, Monitor } from 'lucide-react'
 import type { Plugin } from '../types'
 import { triggerStandby } from '../../lib/idle-monitor'
 
@@ -103,6 +103,10 @@ function SettingsPanel() {
     fetch('/api/system/shutdown', { method: 'POST' }).catch(() => {})
   }
 
+  const exitToDesktop = () => {
+    fetch('/api/system/exit-to-desktop', { method: 'POST' }).catch(() => {})
+  }
+
   if (shuttingDown) {
     return (
       <div style={{ ...panelStyle, alignItems: 'center', justifyContent: 'center' }}>
@@ -144,11 +148,29 @@ function SettingsPanel() {
       <div>
         <div style={{ fontSize: '0.65rem', opacity: 0.7, marginBottom: '0.5rem' }}>Power</div>
         <div style={rowStyle}>
-          <button style={buttonStyle} onClick={standbyNow}>
-            <Moon size={14} /> Standby Now
+          <button
+            style={{ ...buttonStyle, opacity: 0.5, cursor: 'not-allowed' }}
+            onClick={standbyNow}
+            disabled
+            title="Temporarily disabled: standby can leave the display unresponsive to touch/mouse with no way to wake it"
+          >
+            <Moon size={14} /> Standby Unavailable
           </button>
           <button style={buttonStyle} onClick={shutDown}>
             <Power size={14} /> Shut Down
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <div style={{ fontSize: '0.65rem', opacity: 0.7, marginBottom: '0.5rem' }}>Maintenance</div>
+        <div style={rowStyle}>
+          <button
+            style={buttonStyle}
+            onClick={exitToDesktop}
+            title='Closes DeskOS and reveals the RPi desktop. Use the "Return to DeskOS" desktop icon to relaunch.'
+          >
+            <Monitor size={14} /> Exit to Desktop
           </button>
         </div>
       </div>

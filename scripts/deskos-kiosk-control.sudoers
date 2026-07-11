@@ -1,0 +1,2 @@
+__DESKOS_USER__ ALL=(root) NOPASSWD: /usr/bin/systemctl stop deskos-kiosk.service
+__DESKOS_USER__ ALL=(root) NOPASSWD: /usr/bin/systemctl start deskos-kiosk.service

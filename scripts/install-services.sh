@@ -29,4 +29,21 @@ sudo install -o root -g root -m 0440 "${SUDOERS_TMP}" /etc/sudoers.d/deskos-shut
 rm -f "${SUDOERS_TMP}"
 echo "Installed /etc/sudoers.d/deskos-shutdown (user=${DESKOS_USER})"
 
+# Scoped passwordless kiosk stop/start — restricted to exactly these two
+# commands, so the backend's "Exit to Desktop" route and the desktop's
+# "Return to DeskOS" launcher can run them without a broad sudo grant.
+SUDOERS_TMP="$(mktemp)"
+sed "s|__DESKOS_USER__|${DESKOS_USER}|g" "${REPO_DIR}/scripts/deskos-kiosk-control.sudoers" > "${SUDOERS_TMP}"
+sudo visudo -c -f "${SUDOERS_TMP}"
+sudo install -o root -g root -m 0440 "${SUDOERS_TMP}" /etc/sudoers.d/deskos-kiosk-control
+rm -f "${SUDOERS_TMP}"
+echo "Installed /etc/sudoers.d/deskos-kiosk-control (user=${DESKOS_USER})"
+
+# Desktop icon so the kiosk can be relaunched with a mouse only, no keyboard
+# needed to type a command after using "Exit to Desktop".
+mkdir -p "${DESKOS_HOME}/Desktop"
+sed "s|__DESKOS_REPO_DIR__|${REPO_DIR}|g" "${REPO_DIR}/scripts/deskos-return-to-kiosk.desktop" > "${DESKOS_HOME}/Desktop/deskos-return-to-kiosk.desktop"
+chmod +x "${DESKOS_HOME}/Desktop/deskos-return-to-kiosk.desktop"
+echo "Installed ${DESKOS_HOME}/Desktop/deskos-return-to-kiosk.desktop"
+
 echo "Services installed and enabled. Start with: sudo systemctl start deskos-backend"
