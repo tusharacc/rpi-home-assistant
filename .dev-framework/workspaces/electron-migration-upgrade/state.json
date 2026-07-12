@@ -8,7 +8,7 @@
   "branch": "upgrade/electron-migration-upgrade",
   "roles": {
     "po": { "status": "complete", "completed": "2026-07-12T10:40:00Z" },
-    "architect": { "status": "in-progress", "completed": null },
+    "architect": { "status": "complete", "completed": "2026-07-12T11:15:00Z" },
     "developer": { "status": "pending", "completed": null },
     "reviewer": { "status": "pending", "completed": null },
     "tester": { "status": "pending", "completed": null },
@@ -26,6 +26,7 @@
   },
   "timelines": {
     "po_complete": "2026-07-12T10:40:00Z",
-    "architect_start": "2026-07-12T10:41:00Z"
+    "architect_start": "2026-07-12T10:41:00Z",
+    "architect_complete": "2026-07-12T11:15:00Z"
   }
 }
