@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { pluginRegistry } from '../../plugins/registry'
-import { IframeContainer } from './IframeContainer'
 import { ReactContainer } from './ReactContainer'
 import styles from './ContentArea.module.css'
 
@@ -61,15 +60,27 @@ export function ContentArea({ activeItemId }: ContentAreaProps) {
     )
   }
 
+  if (item.contentMode === 'external') {
+    // Reached only via a stale persisted activeItemId from before this item
+    // became external-only (it never becomes active going forward — see
+    // SidebarItem/SidebarWidget). Self-resolves once any other item is picked.
+    return (
+      <main className={styles.contentArea}>
+        <div className={styles.errorState}>
+          <span className={styles.errorLabel}>OPENS SEPARATELY</span>
+          <span className={styles.errorMessage}>
+            Select '{'label' in item ? item.label : item.name}' again from the sidebar to reopen it.
+          </span>
+        </div>
+      </main>
+    )
+  }
+
   return (
     <main className={styles.contentArea}>
-      {item.contentMode === 'iframe' && item.iframeSrc ? (
-        <IframeContainer src={item.iframeSrc} title={'label' in item ? item.label : item.name} />
-      ) : (
-        <ReactContainer>
-          {item.render?.() ?? null}
-        </ReactContainer>
-      )}
+      <ReactContainer>
+        {item.render?.() ?? null}
+      </ReactContainer>
     </main>
   )
 }

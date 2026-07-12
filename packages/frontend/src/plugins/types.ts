@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
 
-export type ContentMode = 'iframe' | 'react'
+// 'external' items never render in ContentArea -- selecting one fires
+// onActivate instead of becoming the active item (see SidebarItem).
+export type ContentMode = 'react' | 'external'
 
 export interface PluginSubItem {
   id: string
@@ -8,8 +10,8 @@ export interface PluginSubItem {
   finePrint?: string
   icon?: ReactNode
   contentMode: ContentMode
-  iframeSrc?: string
   render?: () => ReactNode
+  onActivate?: () => void
 }
 
 export interface Plugin {
@@ -20,8 +22,8 @@ export interface Plugin {
   contentMode: ContentMode
   disabled?: boolean
   subItems?: PluginSubItem[]
-  iframeSrc?: string
   render?: () => ReactNode
+  onActivate?: () => void
   activate: () => void
   deactivate: () => void
   refresh: () => void

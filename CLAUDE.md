@@ -39,6 +39,7 @@ DeskOS is a Raspberry Pi personal information appliance. It's a full-screen kios
 - Any feature needing a privileged one-off command (e.g. shutdown) follows the same templating pattern: a `scripts/*.sudoers` file scoped to the exact command only (never a broad passwordless grant), templated with `__DESKOS_USER__` and installed by `install-services.sh` via `visudo -c` validation before copying into `/etc/sudoers.d/`. See `scripts/deskos-shutdown.sudoers`.
 - Raspberry Pi OS Bookworm/Trixie run Wayland (Chromium via XWayland) rather than classic X11. Don't assume a static `~/.Xauthority` file for manual/SSH-driven Chromium launches — run interactive one-time steps (like epaper sign-in) from a terminal opened directly in the Pi's own graphical session instead of exporting `DISPLAY`/`XAUTHORITY` over SSH.
 - systemd services (`deskos-kiosk.service`'s `ExecStartPre`, `deskos-backend.service`) run outside any graphical login session, so they don't inherit `XDG_RUNTIME_DIR` or `WAYLAND_DISPLAY`. Chromium itself is fine because it runs via XWayland using the `DISPLAY`/`XAUTHORITY` env vars already set on the unit — but any *native* Wayland client (e.g. `wlr-randr`, used by `scripts/apply-orientation.sh` and `scripts/hdmi-power.sh`) fails with `XDG_RUNTIME_DIR is invalid or not set` unless the script derives it itself (`/run/user/$(id -u)`) and locates the actual `wayland-N` socket rather than assuming one is exported. This crash-looped `deskos-kiosk.service` in production before being fixed — see those two scripts for the pattern to follow for any future Wayland-native tooling.
+- Unlike `deskos-kiosk.service`, `deskos-backend.service` does **not** set `DISPLAY`/`XAUTHORITY` (it's API-only, normally has no reason to touch the display). `scripts/launch-epaper.sh` is invoked from the backend but still needs to launch a real Chromium window via XWayland, so it derives `DISPLAY=:0`/`XAUTHORITY=$HOME/.Xauthority` itself rather than assuming they're set — same self-sufficiency principle as the Wayland-native scripts above, just for a different pair of env vars.
 
 ## Code Style
 
@@ -48,9 +49,30 @@ DeskOS is a Raspberry Pi personal information appliance. It's a full-screen kios
 - Express SPA catch-all must stay last in `packages/backend/src/index.ts` and must exclude `/api/*`.
 - No comments explaining *what* the code does. Comments only for non-obvious *why*.
 
-## iframe Embedding
+## Epaper Access (The Hindu / LiveMint)
 
-External epaper sites are embedded via iframe. If a site sends `X-Frame-Options: SAMEORIGIN`, use `--disable-web-security` on Chromium — not a backend proxy. A backend proxy was evaluated and rejected: the proxy fetch runs on the Pi, not in the authenticated browser, so it can't forward the Google SSO session cookie that lives in the Chromium persistent profile, and it can only cover the initial page load — any in-reader navigation would hit the same block again. `--disable-web-security` is acceptable here because DeskOS is a single-purpose personal appliance, not a shared or general-purpose browser.
+Epaper sites are **not** iframe-embedded — News → The Hindu / LiveMint are `contentMode: 'external'`
+sidebar items that POST `/api/system/open-epaper`, which stops `deskos-kiosk.service` and opens the
+epaper as its own top-level Chromium window on the same `--user-data-dir` profile (see
+`scripts/launch-epaper.sh`), the same pattern as "Exit to Desktop". `--disable-web-security` was
+removed from `launch-kiosk.sh` since nothing embeds cross-origin content anymore.
+
+This replaced an earlier iframe-based approach after live debugging found the actual reason it
+never showed as subscribed: The Hindu's epaper SPA stores its session in `localStorage`
+(`<accountId>:session-data`), not a cookie — confirmed by inspecting it directly with Chrome
+DevTools/an MCP browser session, live, against the real site. Chromium's storage partitioning gives
+a third-party iframe (embedded from DeskOS's own origin) a completely separate, permanently-empty
+`localStorage` from the site's real top-level partition, so no amount of re-authenticating in a
+standalone Chromium window ever fixed the kiosk's iframe view — that data structurally could not
+cross the partition boundary. This is unconditional platform behavior in modern Chromium with no
+override flag (same fate as the `SameSiteByDefaultCookies` killswitch, which was tried first and
+confirmed to be a no-op on Chromium 142). A backend proxy was evaluated even earlier and also
+rejected, for a related but distinct reason: it runs on the Pi, not in the authenticated browser, so
+it can't forward whatever session data lives in the Chromium profile at all, cookie or
+`localStorage`. **Net lesson: don't assume iframe-embedding a third-party authenticated SPA will
+carry its login state — verify the actual auth mechanism (cookie vs. token-in-storage) before
+choosing that approach, since only a genuine top-level navigation is guaranteed to share the same
+storage partition as a direct sign-in.**
 
 ## Open Low-Severity Bugs
 

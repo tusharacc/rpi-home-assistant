@@ -8,7 +8,13 @@ interface SidebarItemProps {
 }
 
 export function SidebarItem({ item, isActive, onSelect }: SidebarItemProps) {
-  const handleClick = () => onSelect(item.id)
+  const handleClick = () => {
+    if (item.contentMode === 'external') {
+      item.onActivate?.()
+      return
+    }
+    onSelect(item.id)
+  }
 
   return (
     <div

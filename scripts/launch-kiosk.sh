@@ -16,19 +16,8 @@ xset s off
 xset s noblank
 xset -dpms
 
-# Chrome defaults cookies without an explicit SameSite attribute to Lax,
-# which is sent on direct top-level navigation but withheld on cross-site
-# iframe loads -- exactly the epaper.thehindu.com case here (embedded from
-# this app's own origin). That silently drops the subscription-entitlement
-# cookie in the kiosk even after signing in directly in a standalone
-# Chromium window, so it can show "subscribed" there and "unsubscribed"
-# here. Reverting to legacy behavior (no-SameSite-attribute == None) lets
-# that cookie flow through the iframe. Acceptable on a single-purpose
-# personal kiosk, same tradeoff as --disable-web-security above.
 "${CHROMIUM_BIN}" \
   --kiosk \
-  --disable-web-security \
-  --disable-features=SameSiteByDefaultCookies,CookiesWithoutSameSiteMustBeSecure \
   --user-data-dir="${CHROMIUM_PROFILE}" \
   --no-first-run \
   --disable-default-apps \

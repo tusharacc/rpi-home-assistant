@@ -59,14 +59,14 @@ sudo systemctl start deskos-backend
 
 # 4. One-time epaper authentication (keyboard required — only during setup)
 #    Run this BEFORE enabling the kiosk service, or temporarily exit kiosk mode.
-#    Open Chromium with the same profile the kiosk uses:
+#    Open Chromium with the same profile the kiosk uses, direct to each epaper
+#    (epaper access is NOT embedded in DeskOS — see "Epaper Access" below):
 CHROMIUM_PROFILE="$HOME/.deskos-chromium"
 CHROMIUM_BIN=$(command -v chromium-browser || command -v chromium)
-"$CHROMIUM_BIN" --user-data-dir="$CHROMIUM_PROFILE" http://localhost:3001
-#    In the sidebar: click News → The Hindu → click "Sign in with Google"
-#    Authenticate with tusharacc@gmail.com
-#    Repeat for News → LiveMint
-#    Close Chromium.
+"$CHROMIUM_BIN" --user-data-dir="$CHROMIUM_PROFILE" https://epaper.thehindu.com
+#    Sign in with tusharacc@gmail.com, confirm it shows as subscribed, close Chromium.
+"$CHROMIUM_BIN" --user-data-dir="$CHROMIUM_PROFILE" https://epaper.livemint.com
+#    Repeat sign-in, confirm subscribed, close Chromium.
 
 # 5. Start the kiosk
 sudo systemctl start deskos-kiosk
@@ -76,10 +76,7 @@ sudo systemctl start deskos-kiosk
 
 > **First Chromium launch may prompt to set a keyring password** (for the OS credential store, e.g. gnome-keyring/libsecret). Any password works — it's separate from your Google account. This is currently a manual, interactive step; see the note below about kiosk reboots.
 
-> **Why `--disable-web-security`?**  
-> The Hindu and LiveMint epaper sites may send frame-blocking headers (`X-Frame-Options` / CSP `frame-ancestors`) that prevent embedding them in an iframe from a different origin. A backend-proxy workaround was evaluated and rejected: proxying the shell page server-side can't forward the browser's Google SSO session cookie (the proxy fetch runs on the Pi, not in the authenticated browser), so the embedded reader would always show a logged-out/paywalled view — and only the initial page load could be proxied, so any in-reader navigation would hit the same block again one click deep. The kiosk launch script instead uses `--disable-web-security` to bypass the restriction directly in the browser. This is appropriate for a single-purpose personal appliance running a trusted local app — it is not a shared or general-purpose browser.
-
-> **Session expiry**: Google SSO sessions occasionally expire. If an epaper shows a login page instead of content, reconnect a keyboard and repeat step 4 above.
+> **Session expiry**: if an epaper stops showing as subscribed, either repeat step 4 above, or just click News → The Hindu/LiveMint on the kiosk itself — it opens the same real Chromium window (see "Epaper Access" below), which you can sign into directly with a temporarily-attached keyboard, then close and tap "Return to DeskOS".
 
 ### Deploying Updates
 
@@ -124,20 +121,23 @@ journalctl -u deskos-news-pipeline.service -f
 - **`deskos-kiosk` crash-loops with `XDG_RUNTIME_DIR is invalid or not set` / `failed to connect to display`**: `scripts/apply-orientation.sh` and `scripts/hdmi-power.sh` use `wlr-randr`, a native Wayland client — unlike Chromium (which reaches the display fine via XWayland using `DISPLAY`/`XAUTHORITY`), it needs `XDG_RUNTIME_DIR`/`WAYLAND_DISPLAY`, which systemd services don't inherit from any graphical login session. Both scripts now derive these themselves; if you still see this error, confirm a `wayland-*` socket actually exists under `/run/user/<uid>` at boot (it depends on your Pi's auto-login mechanism creating a real login session).
 - **Orientation button returns `500` on the Pi**: confirm which Wayland compositor is running (`echo $XDG_CURRENT_DESKTOP`) — `apply-orientation.sh`/`hdmi-power.sh` assume `wlr-randr` (labwc); if you're on `wayfire` the command syntax may need adjusting. (Standby is currently disabled in the UI — see "Display, Power & Settings" — so it can no longer trigger this.)
 - **"Return to DeskOS" desktop icon doesn't appear, or "Exit to Desktop" returns `500`**: re-run `./scripts/install-services.sh` — it installs both the `deskos-kiosk-control` sudoers rule and the desktop icon, and is safe to re-run on an existing install.
+- **Clicking News → The Hindu/LiveMint does nothing, or the epaper window shows a blank/never-signed-in profile**: confirm `scripts/launch-epaper.sh` is executable (`chmod +x`, should already be set by git) and that `chromium --version`/`chromium-browser --version` resolves on the Pi (same detection `launch-kiosk.sh` uses). If the window opens but isn't signed in, that's expected on a fresh profile — do step 4's one-time sign-in for that site.
 
 ## Plugin Architecture
 
 Each application is a plugin registered in `packages/frontend/src/plugins/registry.ts`. Plugins declare:
 - `id`, `name`, `icon`
-- `contentMode`: `'react'` (custom component) or `'iframe'` (external URL)
+- `contentMode`: `'react'` (custom component, rendered in DeskOS) or `'external'` (fires `onActivate`
+  instead of becoming the active item — used for things that open outside DeskOS entirely, e.g. the
+  epaper sites; see "Epaper Access" below)
 - Optional `subItems` for expandable sidebar sections
 
 ## Current Plugins
 
 | Plugin | Status | Content |
 |--------|--------|---------|
-| News › The Hindu | Active | ePaper iframe (`epaper.thehindu.com`) |
-| News › LiveMint | Active | ePaper iframe (`epaper.livemint.com`) |
+| News › The Hindu | Active | Opens `epaper.thehindu.com` as its own top-level Chromium window (not embedded — see "Epaper Access") |
+| News › LiveMint | Active | Opens `epaper.livemint.com` as its own top-level Chromium window (not embedded — see "Epaper Access") |
 | News › Other News | Active | News Intelligence reading queue (Balanced/Engineering/AI Focus modes, Queue/Radar tabs), articles open in an in-app reader instead of a new window |
 | Settings | Active | System uptime, display orientation, Shut Down, Exit to Desktop (Standby Now temporarily disabled — see below) |
 | Investments | Placeholder | Coming later |
@@ -160,6 +160,15 @@ Each application is a plugin registered in `packages/frontend/src/plugins/regist
   This locked the physical device twice before being found. Re-enable only after `hdmi-power.sh`
   is switched to a true DPMS blank (e.g. `wlopm`/`wlr-output-power-management-v1`, if the
   compositor supports it) that keeps the output in the layout and input flowing.
+- **Epaper Access**: News → The Hindu/LiveMint don't embed the epaper in DeskOS — clicking them
+  POSTs `/api/system/open-epaper`, which stops the kiosk and opens the epaper as its own top-level
+  Chromium window on the shared profile (`scripts/launch-epaper.sh`), same mechanism as Exit to
+  Desktop. This replaced iframe embedding after live debugging found The Hindu's epaper session
+  lives in `localStorage`, not a cookie — Chromium's storage partitioning gives a third-party
+  iframe a totally separate, permanently-empty `localStorage` from the real top-level site, so no
+  amount of re-authenticating ever worked from inside an iframe. Only a genuine top-level page load
+  shares the same partition as a direct sign-in. See CLAUDE.md's "Epaper Access" section for the
+  full story. Close the epaper window and tap "Return to DeskOS" to come back.
 - **Exit to Desktop**: the "Exit to Desktop" button stops `deskos-kiosk.service` (a clean
   `systemctl stop`, so `Restart=on-failure` does not relaunch it), revealing the underlying RPi
   desktop for maintenance — no SSH needed. To come back, double-click the "Return to DeskOS" icon

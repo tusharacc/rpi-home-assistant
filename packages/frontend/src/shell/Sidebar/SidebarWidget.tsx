@@ -21,7 +21,11 @@ export function SidebarWidget({ plugin, activeItemId, isExpanded, onSelect, onTo
   const handleHeaderClick = () => {
     if (plugin.disabled) return
     if (isLeaf) {
-      onSelect(plugin.id)
+      if (plugin.contentMode === 'external') {
+        plugin.onActivate?.()
+      } else {
+        onSelect(plugin.id)
+      }
     } else {
       onToggleExpand(plugin.id)
     }
