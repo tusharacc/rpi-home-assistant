@@ -8,6 +8,18 @@ app.setPath('userData', path.join(os.homedir(), '.deskos-electron'))
 
 const DESKOS_URL = process.env.DESKOS_URL ?? 'http://localhost:3001'
 
+// The only URLs the main process will ever load into a BrowserView, keyed by
+// viewId. The renderer's `url` argument to embed:show is checked against this
+// rather than trusted outright -- the DeskOS frontend is trusted today, but an
+// IPC boundary that accepts an arbitrary URL from any renderer script that
+// happens to run (e.g. a future XSS in rendered content) is exactly the kind
+// of open redirect-into-a-persistent-session this app shouldn't have, matching
+// the enum validation the HTTP route this replaced used to do.
+const EMBEDDABLE_VIEWS: Record<string, string> = {
+  'news-the-hindu': 'https://epaper.thehindu.com',
+  'news-livemint': 'https://epaper.livemint.com',
+}
+
 // Mirrors --sidebar-width in packages/frontend/src/index.css. No automatic
 // sharing between a CSS custom property and this process -- keep in sync
 // manually if the sidebar width ever changes (see architect Open Question 2).
@@ -95,12 +107,15 @@ function isNonEmptyString(value: unknown): value is string {
   return typeof value === 'string' && value.length > 0
 }
 
-ipcMain.handle('embed:show', (_event, viewId: unknown, url: unknown) => {
+ipcMain.handle('embed:show', (event, viewId: unknown, url: unknown) => {
+  if (event.sender !== mainWindow?.webContents) return
   if (!isNonEmptyString(viewId) || !isNonEmptyString(url)) return
+  if (EMBEDDABLE_VIEWS[viewId] !== url) return
   showEmbeddedView(viewId, url)
 })
 
-ipcMain.handle('embed:hide', () => {
+ipcMain.handle('embed:hide', (event) => {
+  if (event.sender !== mainWindow?.webContents) return
   hideEmbeddedView()
 })
 

@@ -9,7 +9,7 @@
   "roles": {
     "po": { "status": "complete", "completed": "2026-07-12T10:40:00Z" },
     "architect": { "status": "complete", "completed": "2026-07-12T11:15:00Z" },
-    "developer": { "status": "in-progress", "completed": null },
+    "developer": { "status": "complete", "completed": "2026-07-12T13:40:00Z" },
     "reviewer": { "status": "pending", "completed": null },
     "tester": { "status": "pending", "completed": null },
     "executor": { "status": "pending", "completed": null },
@@ -33,6 +33,7 @@
     "developer_complete": "2026-07-12T12:30:00Z",
     "reviewer_start": "2026-07-12T12:31:00Z",
     "reviewer_blocked": "2026-07-12T13:23:47Z",
-    "developer_start_2": "2026-07-12T13:24:00Z"
+    "developer_start_2": "2026-07-12T13:24:00Z",
+    "developer_complete_2": "2026-07-12T13:40:00Z"
   }
 }

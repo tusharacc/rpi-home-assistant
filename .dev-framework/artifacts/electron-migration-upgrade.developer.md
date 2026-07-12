@@ -112,6 +112,19 @@ for.
   doc's reasoning (both operate on the Wayland output, transparent to any XWayland client including
   Electron) and via not finding any Electron-specific interaction point in either script.
 
+## Code Quality Fixes (post-review round 1)
+
+`code-quality-report.md` blocked hand-off on one MEDIUM (SC-08) and filed one LOW as advisory. Both
+fixed directly rather than deferred:
+
+- **[MEDIUM] SC-08** — `packages/electron/src/main.ts`'s `embed:show` IPC handler trusted the
+  renderer's `url` argument outright, a regression from the enum-validated `open-epaper` route it
+  replaced. Fixed by adding `EMBEDDABLE_VIEWS`, a fixed `viewId → url` map, and rejecting any call
+  where `url` doesn't match the expected value for `viewId`.
+- **[LOW] advisory** — neither `embed:show` nor `embed:hide` verified `event.sender` against the
+  trusted main window's `webContents`. Fixed by adding that check to both handlers (not filed as a
+  bug since it's resolved, not deferred).
+
 ## Open Items for Tester/Executor
 
 1. **On-device Node version check** (`node --version` on the Pi) — blocks confidently answering whether
