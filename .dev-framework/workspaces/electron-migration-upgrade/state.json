@@ -3,12 +3,12 @@
   "type": "upgrade",
   "workflowType": "full",
   "created": "2026-07-12T10:27:32Z",
-  "currentPhase": "po",
+  "currentPhase": "architect",
   "status": "active",
   "branch": "upgrade/electron-migration-upgrade",
   "roles": {
     "po": { "status": "complete", "completed": "2026-07-12T10:40:00Z" },
-    "architect": { "status": "pending", "completed": null },
+    "architect": { "status": "in-progress", "completed": null },
     "developer": { "status": "pending", "completed": null },
     "reviewer": { "status": "pending", "completed": null },
     "tester": { "status": "pending", "completed": null },
@@ -17,12 +17,15 @@
   },
   "artifacts": {
     "po": "artifacts/electron-migration-upgrade.po.md",
-    "architect": null,
+    "architect": "artifacts/electron-migration-upgrade.architect.md",
     "developer": null,
     "reviewer": null,
     "tester": null,
     "executor": null,
     "po-approval": null
   },
-  "timelines": {}
+  "timelines": {
+    "po_complete": "2026-07-12T10:40:00Z",
+    "architect_start": "2026-07-12T10:41:00Z"
+  }
 }
