@@ -11,7 +11,7 @@
     "architect": { "status": "complete", "completed": "2026-07-12T11:15:00Z" },
     "developer": { "status": "complete", "completed": "2026-07-12T13:40:00Z" },
     "reviewer": { "status": "complete", "completed": "2026-07-12T13:50:00Z" },
-    "tester": { "status": "in-progress", "completed": null },
+    "tester": { "status": "complete", "completed": "2026-07-12T14:05:00Z" },
     "executor": { "status": "pending", "completed": null },
     "po-approval": { "status": "pending", "completed": null }
   },
@@ -37,6 +37,7 @@
     "developer_complete_2": "2026-07-12T13:40:00Z",
     "reviewer_start_2": "2026-07-12T13:41:00Z",
     "reviewer_complete": "2026-07-12T13:50:00Z",
-    "tester_start": "2026-07-12T13:51:00Z"
+    "tester_start": "2026-07-12T13:51:00Z",
+    "tester_complete": "2026-07-12T14:05:00Z"
   }
 }
