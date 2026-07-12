@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { pluginRegistry } from '../../plugins/registry'
 import { ReactContainer } from './ReactContainer'
+import { EmbeddedWebviewContainer } from './EmbeddedWebviewContainer'
 import styles from './ContentArea.module.css'
 
 interface ContentAreaProps {
@@ -72,6 +73,14 @@ export function ContentArea({ activeItemId }: ContentAreaProps) {
             Select '{'label' in item ? item.label : item.name}' again from the sidebar to reopen it.
           </span>
         </div>
+      </main>
+    )
+  }
+
+  if (item.contentMode === 'embedded-webview' && item.embeddedUrl) {
+    return (
+      <main className={styles.contentArea}>
+        <EmbeddedWebviewContainer viewId={item.id} url={item.embeddedUrl} />
       </main>
     )
   }

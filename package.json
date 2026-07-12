@@ -1,11 +1,12 @@
 {
   "name": "deskos",
   "private": true,
-  "workspaces": ["packages/frontend", "packages/backend"],
+  "workspaces": ["packages/frontend", "packages/backend", "packages/electron"],
   "scripts": {
     "dev": "concurrently \"npm run dev -w packages/backend\" \"npm run dev -w packages/frontend\"",
-    "build": "npm run build -w packages/backend && npm run build -w packages/frontend",
-    "start": "npm run start -w packages/backend"
+    "build": "npm run build -w packages/backend && npm run build -w packages/frontend && npm run build -w packages/electron",
+    "start": "npm run start -w packages/backend",
+    "electron:dev": "npm run build -w packages/electron && DESKOS_URL=http://localhost:3000 electron packages/electron/dist/main.js"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
