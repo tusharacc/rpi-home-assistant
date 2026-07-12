@@ -3,14 +3,14 @@
   "type": "upgrade",
   "workflowType": "full",
   "created": "2026-07-12T10:27:32Z",
-  "currentPhase": "developer",
+  "currentPhase": "reviewer",
   "status": "active",
   "branch": "upgrade/electron-migration-upgrade",
   "roles": {
     "po": { "status": "complete", "completed": "2026-07-12T10:40:00Z" },
     "architect": { "status": "complete", "completed": "2026-07-12T11:15:00Z" },
     "developer": { "status": "complete", "completed": "2026-07-12T12:30:00Z" },
-    "reviewer": { "status": "pending", "completed": null },
+    "reviewer": { "status": "in-progress", "completed": null },
     "tester": { "status": "pending", "completed": null },
     "executor": { "status": "pending", "completed": null },
     "po-approval": { "status": "pending", "completed": null }
@@ -19,7 +19,7 @@
     "po": "artifacts/electron-migration-upgrade.po.md",
     "architect": "artifacts/electron-migration-upgrade.architect.md",
     "developer": "artifacts/electron-migration-upgrade.developer.md",
-    "reviewer": null,
+    "reviewer": "artifacts/electron-migration-upgrade.reviewer.md",
     "tester": null,
     "executor": null,
     "po-approval": null
@@ -29,6 +29,7 @@
     "architect_start": "2026-07-12T10:41:00Z",
     "architect_complete": "2026-07-12T11:15:00Z",
     "developer_start": "2026-07-12T11:16:00Z",
-    "developer_complete": "2026-07-12T12:30:00Z"
+    "developer_complete": "2026-07-12T12:30:00Z",
+    "reviewer_start": "2026-07-12T12:31:00Z"
   }
 }
