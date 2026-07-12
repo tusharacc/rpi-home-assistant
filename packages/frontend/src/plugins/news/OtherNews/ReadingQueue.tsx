@@ -1,5 +1,5 @@
 import { Newspaper } from 'lucide-react'
-import type { ReadingMode } from './types'
+import type { ArticleReaderRequest, ReadingMode } from './types'
 import { useNewsQueue } from './useNewsQueue'
 import { ArticleCard } from './ArticleCard'
 
@@ -19,7 +19,7 @@ const emptyStateStyle: React.CSSProperties = {
 
 interface ReadingQueueProps {
   mode: ReadingMode
-  onOpenArticle: (url: string) => void
+  onOpenArticle: (request: ArticleReaderRequest) => void
 }
 
 export function ReadingQueue({ mode, onOpenArticle }: ReadingQueueProps) {

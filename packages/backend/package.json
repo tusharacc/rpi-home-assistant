@@ -9,15 +9,20 @@
     "news:pipeline": "tsx src/scripts/news-pipeline/index.ts"
   },
   "dependencies": {
+    "@mozilla/readability": "^0.6.0",
     "better-sqlite3": "^12.11.1",
     "dotenv": "^17.4.2",
     "express": "^4.19.2",
-    "rss-parser": "^3.13.0"
+    "jsdom": "^29.1.1",
+    "rss-parser": "^3.13.0",
+    "sanitize-html": "^2.17.5"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
     "@types/express": "^4.17.21",
+    "@types/jsdom": "^28.0.3",
     "@types/node": "^22.5.4",
+    "@types/sanitize-html": "^2.16.1",
     "tsx": "^4.19.1",
     "typescript": "^5.5.3"
   }

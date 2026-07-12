@@ -121,6 +121,18 @@ export function findArticleByUrlHash(urlHash: string): Article | undefined {
   return row ? rowToArticle(row) : undefined
 }
 
+// Confines /api/news/extract to URLs we already discovered and stored, rather
+// than being an open URL-fetch proxy an attacker could point at internal hosts.
+export function isKnownArticleUrl(url: string): boolean {
+  const row = getDb()
+    .prepare(
+      `SELECT 1 FROM articles WHERE url = ?
+       UNION SELECT 1 FROM radar_items WHERE url = ?`,
+    )
+    .get(url, url)
+  return row !== undefined
+}
+
 export function findArticleByTitleHash(titleHash: string): Article | undefined {
   const row = getDb()
     .prepare("SELECT * FROM articles WHERE title_hash = ? AND status != 'expired'")

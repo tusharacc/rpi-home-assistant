@@ -4,10 +4,12 @@ import {
   getQueue,
   getRadarItems,
   getSourcePrefs,
+  isKnownArticleUrl,
   setArticleStatus,
   setSourceFollowed,
   setSourceHidden,
 } from '../news/db'
+import { extractReadableArticle } from '../news/extract'
 import type { ArticleAction, ReadingMode, Status } from '../news/types'
 
 const VALID_MODES: ReadingMode[] = ['balanced', 'engineering', 'ai-focus']
@@ -40,6 +42,40 @@ newsRouter.get('/news/radar', (_req, res) => {
 
 newsRouter.get('/news/sources', (_req, res) => {
   res.json(getSourcePrefs())
+})
+
+newsRouter.get('/news/extract', async (req, res) => {
+  const url = typeof req.query.url === 'string' ? req.query.url : undefined
+  if (!url) {
+    res.status(400).json({ error: 'url query param is required' })
+    return
+  }
+
+  let parsed: URL
+  try {
+    parsed = new URL(url)
+  } catch {
+    res.status(400).json({ error: 'invalid url' })
+    return
+  }
+  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+    res.status(400).json({ error: 'invalid url' })
+    return
+  }
+
+  // Only ever extract URLs we ourselves discovered and stored — otherwise
+  // this becomes an open URL-fetch proxy.
+  if (!isKnownArticleUrl(url)) {
+    res.status(404).json({ error: 'unknown article url' })
+    return
+  }
+
+  try {
+    const article = await extractReadableArticle(url)
+    res.json(article)
+  } catch {
+    res.status(502).json({ error: 'could not load a readable version of this article' })
+  }
 })
 
 newsRouter.post('/news/:id/action', (req, res) => {

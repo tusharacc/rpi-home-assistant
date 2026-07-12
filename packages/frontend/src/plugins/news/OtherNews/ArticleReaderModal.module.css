@@ -1,0 +1,29 @@
+.content {
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+.content img {
+  max-width: 100%;
+  height: auto;
+}
+
+.content a {
+  color: var(--accent);
+}
+
+.content p,
+.content ul,
+.content ol,
+.content blockquote,
+.content pre,
+.content figure {
+  margin: 0 0 1rem;
+}
+
+.content pre {
+  overflow-x: auto;
+  padding: 0.75rem;
+  background: var(--bg-sidebar);
+  border-radius: 4px;
+}

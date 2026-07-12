@@ -1,11 +1,11 @@
 import { Bookmark, X, Check, ExternalLink, Lock } from 'lucide-react'
-import type { Article } from './types'
+import type { Article, ArticleReaderRequest } from './types'
 import { SourceMenu } from './SourceMenu'
 
 interface ArticleCardProps {
   article: Article
   onAction: (id: number, action: 'save' | 'ignore' | 'read') => void
-  onOpenArticle: (url: string) => void
+  onOpenArticle: (request: ArticleReaderRequest) => void
 }
 
 const cardStyle: React.CSSProperties = {
@@ -108,7 +108,7 @@ export function ArticleCard({ article, onAction, onOpenArticle }: ArticleCardPro
         </button>
         <button
           style={{ ...actionButtonStyle, marginLeft: 'auto' }}
-          onClick={() => onOpenArticle(article.url)}
+          onClick={() => onOpenArticle({ url: article.url, title: article.title })}
           aria-label="Open original"
         >
           <ExternalLink size={16} />

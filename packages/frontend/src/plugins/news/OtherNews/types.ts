@@ -43,3 +43,8 @@ export interface SourcePref {
   hidden: boolean
   followed: boolean
 }
+
+export interface ArticleReaderRequest {
+  url: string
+  title: string
+}

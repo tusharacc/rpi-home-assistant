@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Star, Tag, ExternalLink, Radar } from 'lucide-react'
-import type { Article, RadarItem } from './types'
+import type { Article, ArticleReaderRequest, RadarItem } from './types'
 import { ArticleCard } from './ArticleCard'
 import { postArticleAction } from './api'
 
@@ -48,9 +48,18 @@ const repoMetaStyle: React.CSSProperties = {
   whiteSpace: 'nowrap',
 }
 
-function RepoRow({ item, onOpenArticle }: { item: RadarItem; onOpenArticle: (url: string) => void }) {
+function RepoRow({
+  item,
+  onOpenArticle,
+}: {
+  item: RadarItem
+  onOpenArticle: (request: ArticleReaderRequest) => void
+}) {
   return (
-    <button style={{ ...repoRowStyle, width: '100%', background: 'transparent', border: 'none', cursor: 'pointer', font: 'inherit', textAlign: 'left' }} onClick={() => onOpenArticle(item.url)}>
+    <button
+      style={{ ...repoRowStyle, width: '100%', background: 'transparent', border: 'none', cursor: 'pointer', font: 'inherit', textAlign: 'left' }}
+      onClick={() => onOpenArticle({ url: item.url, title: item.repoFullName })}
+    >
       <div style={{ minWidth: 0 }}>
         <div style={{ fontSize: '0.85rem' }}>{item.repoFullName}</div>
         {item.description && (
@@ -98,7 +107,11 @@ const emptyStateStyle: React.CSSProperties = {
   textTransform: 'uppercase',
 }
 
-export function EngineeringRadar({ onOpenArticle }: { onOpenArticle: (url: string) => void }) {
+export function EngineeringRadar({
+  onOpenArticle,
+}: {
+  onOpenArticle: (request: ArticleReaderRequest) => void
+}) {
   const [data, setData] = useState<RadarResponse | null>(null)
 
   useEffect(() => {
