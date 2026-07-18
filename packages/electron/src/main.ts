@@ -34,6 +34,14 @@ function computeContentBounds(win: BrowserWindow): { x: number; y: number; width
   return { x: SIDEBAR_WIDTH_PX, y: 0, width: Math.max(width - SIDEBAR_WIDTH_PX, 0), height }
 }
 
+function isGoogleAuthUrl(targetUrl: string): boolean {
+  try {
+    return new URL(targetUrl).hostname === 'accounts.google.com'
+  } catch {
+    return false
+  }
+}
+
 function getOrCreateView(viewId: string, url: string): BrowserView {
   const existing = embeddedViews.get(viewId)
   if (existing) return existing
@@ -48,10 +56,30 @@ function getOrCreateView(viewId: string, url: string): BrowserView {
       sandbox: true,
     },
   })
-  // Deny new-window requests from the embedded site itself -- an outbound
-  // link spawning a further top-level window is exactly the unclosable-
-  // window bug class this whole feature exists to avoid.
-  view.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
+  // Deny new-window requests by default -- an outbound link spawning a
+  // further top-level window is exactly the unclosable-window bug class
+  // this whole feature exists to avoid. One deliberate exception: Google's
+  // own sign-in flow opens accounts.google.com in a popup (DeskOS itself
+  // never handles login flows, per CLAUDE.md), so allow specifically that
+  // as a real, closable window on its own persistent partition -- shared
+  // across embedded sites so signing into Google once covers all of them,
+  // separate from each site's own persist:<viewId> session.
+  view.webContents.setWindowOpenHandler(({ url: targetUrl }) => {
+    if (!isGoogleAuthUrl(targetUrl)) return { action: 'deny' }
+    return {
+      action: 'allow',
+      overrideBrowserWindowOptions: {
+        width: 500,
+        height: 650,
+        webPreferences: {
+          partition: 'persist:google-auth',
+          contextIsolation: true,
+          nodeIntegration: false,
+          sandbox: true,
+        },
+      },
+    }
+  })
   void view.webContents.loadURL(url)
 
   embeddedViews.set(viewId, view)
