@@ -194,7 +194,15 @@ function repositionActiveView(): void {
 function isPdfUrl(targetUrl: string): boolean {
   try {
     const parsed = new URL(targetUrl)
-    return (parsed.protocol === 'http:' || parsed.protocol === 'https:') && parsed.pathname.toLowerCase().endsWith('.pdf')
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return false
+    const path = parsed.pathname.toLowerCase()
+    // .pdf suffix covers traditional filenames; /pdf/ as a path segment
+    // covers content-negotiated schemes with no file extension at all --
+    // confirmed live, arXiv serves PDFs at e.g. arxiv.org/pdf/2607.15277,
+    // no ".pdf" anywhere in the URL, which the suffix-only check missed
+    // entirely and silently fell through to the (always-failing, PDFs
+    // aren't HTML) Readability extraction path instead.
+    return path.endsWith('.pdf') || /\/pdf\//.test(path)
   } catch {
     return false
   }
