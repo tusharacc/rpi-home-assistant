@@ -191,6 +191,38 @@ function repositionActiveView(): void {
   if (view) view.setBounds(computeContentBounds(mainWindow))
 }
 
+function isPdfUrl(targetUrl: string): boolean {
+  try {
+    const parsed = new URL(targetUrl)
+    return (parsed.protocol === 'http:' || parsed.protocol === 'https:') && parsed.pathname.toLowerCase().endsWith('.pdf')
+  } catch {
+    return false
+  }
+}
+
+// Server-side Readability extraction (the Other News reader) can only parse
+// HTML, not PDFs -- e.g. arXiv's "View PDF" link always failed with
+// "couldn't load a readable version". A real, normal (non-kiosk) window with
+// window chrome lets Chromium's built-in PDF viewer render it directly, and
+// the user can close it like a real window since it isn't kiosk-mode.
+function openPdfWindow(url: string): void {
+  const pdfWindow = new BrowserWindow({
+    width: 900,
+    height: 700,
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: true,
+      plugins: true, // enables Chromium's built-in PDF viewer
+    },
+  })
+  pdfWindow.setMenuBarVisibility(false)
+  pdfWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
+  attachDiagnostics(pdfWindow.webContents, 'pdf-viewer')
+  void pdfWindow.loadURL(url)
+  log('info', `Opened PDF viewer window for ${url}`)
+}
+
 function createMainWindow(): BrowserWindow {
   const win = new BrowserWindow({
     kiosk: true,
@@ -241,6 +273,12 @@ ipcMain.handle('embed:show', (event, viewId: unknown, url: unknown) => {
 ipcMain.handle('embed:hide', (event) => {
   if (event.sender !== mainWindow?.webContents) return
   hideEmbeddedView()
+})
+
+ipcMain.handle('pdf:open', (event, url: unknown) => {
+  if (event.sender !== mainWindow?.webContents) return
+  if (!isNonEmptyString(url) || !isPdfUrl(url)) return
+  openPdfWindow(url)
 })
 
 app.whenReady().then(() => {

@@ -8,6 +8,7 @@ declare global {
       isElectron: true
       showEmbeddedView: (viewId: string, url: string) => Promise<void>
       hideEmbeddedView: () => Promise<void>
+      openPdf: (url: string) => Promise<void>
     }
   }
 }

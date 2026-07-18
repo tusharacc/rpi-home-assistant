@@ -27,6 +27,18 @@ function isExtractedArticle(value: unknown): value is ExtractedArticle {
   )
 }
 
+// Readability (the extraction API this reader calls) can only parse HTML --
+// a PDF URL always fails with "couldn't load a readable version". Route
+// these to Electron's native PDF viewer instead (a real, closable window)
+// rather than attempting extraction at all.
+function isPdfUrl(candidateUrl: string): boolean {
+  try {
+    return new URL(candidateUrl).pathname.toLowerCase().endsWith('.pdf')
+  } catch {
+    return false
+  }
+}
+
 const overlayStyle: React.CSSProperties = {
   position: 'fixed',
   inset: 0,
@@ -112,6 +124,12 @@ export function ArticleReaderModal({ url, title, onClose, onNavigate }: ArticleR
   const [article, setArticle] = useState<ExtractedArticle | null>(null)
 
   useEffect(() => {
+    if (isPdfUrl(url)) {
+      window.deskosElectron?.openPdf(url)
+      onClose()
+      return
+    }
+
     let cancelled = false
     setStatus('loading')
     setArticle(null)
@@ -140,16 +158,20 @@ export function ArticleReaderModal({ url, title, onClose, onNavigate }: ArticleR
   // PDF") with no target="_blank" -- left alone, that's a same-window
   // navigation that hijacks the entire kiosk window (no back/close button in
   // kiosk mode; confirmed live, only Alt+F4 got out of it, closing the whole
-  // app). Re-route link clicks through the reader itself instead: re-extract
-  // the linked URL and show it in this same modal. PDFs will just show the
-  // "couldn't load a readable version" error state -- not ideal, but a closed
-  // system, never a hijacked kiosk.
+  // app). Re-route link clicks through the reader itself instead: PDFs open
+  // in Electron's native viewer (a real closable window, current reader
+  // stays open underneath); everything else re-extracts and shows in this
+  // same modal.
   function handleContentClick(event: MouseEvent<HTMLDivElement>): void {
     const anchor = (event.target as HTMLElement).closest('a')
     if (!anchor) return
     const href = anchor.getAttribute('href')
     if (!href || !/^https?:\/\//.test(href)) return
     event.preventDefault()
+    if (isPdfUrl(href)) {
+      window.deskosElectron?.openPdf(href)
+      return
+    }
     onNavigate({ url: href, title: anchor.textContent?.trim() || title })
   }
 
