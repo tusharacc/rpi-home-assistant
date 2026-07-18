@@ -89,8 +89,8 @@ sudo systemctl start deskos-kiosk
 
 For pulling later changes onto an already-set-up Pi (not the one-time setup above), run
 `scripts/deploy-to-pi.sh` **from your Mac** (not on the Pi) — it automates the whole sequence: copying
-gitignored local state (`.env`, a locally-populated `news.db`) the Pi needs, then SSHing in to pull,
-build, reinstall services, and restart.
+gitignored local state (`.env`) the Pi needs, then SSHing in to pull, build, reinstall services, and
+restart.
 
 ```bash
 export DESKOS_PI_USER=<pi-user>
@@ -103,16 +103,23 @@ export DESKOS_PI_DIR=<repo-path-on-pi>
 branch is currently checked out locally — refuses to run if that branch has unpushed commits or
 uncommitted changes, since the Pi does its own `git pull` and would otherwise silently deploy nothing
 new. Pass `--branch <name>` to deploy a specific branch regardless of what's checked out locally,
-`--skip-transfer` to skip the `.env`/`news.db` copy (e.g. they already match on the Pi), or
-`--trigger-pipeline` to also manually start the news pipeline once instead of waiting up to 3 days for
-the timer.
+`--skip-transfer` to skip the `.env` copy (e.g. it already matches on the Pi), or `--trigger-pipeline`
+to also manually start the news pipeline once instead of waiting up to 3 days for the timer.
+
+> **`news.db` is never transferred by default, on purpose.** Earlier versions of this script copied a
+> local `news.db` to the Pi whenever the file merely *existed* here — but a local `news.db` is a
+> near-universal side effect of ever running `npm run dev` on your Mac (the backend auto-creates an
+> empty one via `CREATE TABLE IF NOT EXISTS`), so this silently clobbered the Pi's real, populated
+> database on every single deploy. Confirmed live — this cost real debugging time chasing a phantom
+> "articles keep disappearing" bug that was actually just this script overwriting good data with an
+> empty local stub. Only pass `--push-local-db` if you've deliberately populated data on this machine
+> and specifically want to push it to the Pi (rare — e.g. first-time seeding).
 
 Equivalent manual steps, if you'd rather run them by hand or the script doesn't fit your setup:
 
 ```bash
 # From your Mac
 scp .env <pi-user>@<pi-host>:<repo-path-on-pi>/.env
-scp packages/backend/data/news.db* <pi-user>@<pi-host>:<repo-path-on-pi>/packages/backend/data/   # only if a local db exists
 
 # On the Pi
 ssh <pi-user>@<pi-host>

@@ -18,7 +18,18 @@ set -euo pipefail
 #
 # Flags:
 #   --branch <name>       Branch to deploy (default: current local branch)
-#   --skip-transfer       Skip scp of .env/news.db (they already match on the Pi)
+#   --skip-transfer       Skip scp of .env (it already matches on the Pi)
+#   --push-local-db       DANGEROUS, off by default: overwrite the Pi's live
+#                         news.db with this machine's local copy. A local
+#                         news.db is a near-universal side effect of ever
+#                         running `npm run dev` here (an empty
+#                         CREATE TABLE IF NOT EXISTS stub, no real rows) --
+#                         earlier versions of this script transferred it
+#                         unconditionally whenever the file merely existed
+#                         locally, which silently clobbered the Pi's real,
+#                         populated database on every single deploy. Only
+#                         pass this if you specifically populated data here
+#                         and want to push it, e.g. first-time seeding.
 #   --trigger-pipeline     After deploy, manually start the news pipeline once
 #                          instead of waiting up to 3 days for the timer
 
@@ -27,6 +38,7 @@ PI_HOST="${DESKOS_PI_HOST:-}"
 PI_DIR="${DESKOS_PI_DIR:-}"
 BRANCH=""
 SKIP_TRANSFER=0
+PUSH_LOCAL_DB=0
 TRIGGER_PIPELINE=0
 
 while [[ $# -gt 0 ]]; do
@@ -36,6 +48,7 @@ while [[ $# -gt 0 ]]; do
     --dir) PI_DIR="$2"; shift 2 ;;
     --branch) BRANCH="$2"; shift 2 ;;
     --skip-transfer) SKIP_TRANSFER=1; shift ;;
+    --push-local-db) PUSH_LOCAL_DB=1; shift ;;
     --trigger-pipeline) TRIGGER_PIPELINE=1; shift ;;
     *)
       echo "ERROR: unknown argument: $1" >&2
@@ -77,10 +90,15 @@ if [[ "$SKIP_TRANSFER" -eq 0 ]]; then
     echo "==> Copying .env (gitignored, git pull won't carry it)"
     scp .env "${PI_USER}@${PI_HOST}:${PI_DIR}/.env"
   fi
+fi
+
+if [[ "$PUSH_LOCAL_DB" -eq 1 ]]; then
   if compgen -G "packages/backend/data/news.db*" > /dev/null; then
-    echo "==> Copying local news.db (gitignored)"
+    echo "==> --push-local-db set: overwriting the Pi's news.db with this machine's local copy"
     ssh "${PI_USER}@${PI_HOST}" "mkdir -p ${PI_DIR}/packages/backend/data"
     scp packages/backend/data/news.db* "${PI_USER}@${PI_HOST}:${PI_DIR}/packages/backend/data/"
+  else
+    echo "==> --push-local-db set, but no local news.db found -- nothing to push"
   fi
 fi
 
