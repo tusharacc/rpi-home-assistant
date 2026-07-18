@@ -203,6 +203,22 @@ function createMainWindow(): BrowserWindow {
   })
 
   win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
+  // The kiosk window must never leave the DeskOS app itself -- confirmed
+  // live: a raw <a href> inside Readability-extracted article content (e.g.
+  // arXiv's "View PDF" link) with no target="_blank" is a same-window
+  // navigation, not a new-window request, so setWindowOpenHandler above
+  // never even saw it. Chromium's built-in PDF viewer then took over the
+  // entire kiosk window with no back/close affordance (no window chrome in
+  // kiosk mode) -- the only way out was Alt+F4, which closed the whole app.
+  // This is a second, independent guard for the same
+  // "kiosk must not navigate away" property, at the same-window layer
+  // rather than the new-window layer.
+  win.webContents.on('will-navigate', (event, targetUrl) => {
+    if (new URL(targetUrl).origin !== new URL(DESKOS_URL).origin) {
+      event.preventDefault()
+      log('warn', `Blocked main window navigation away from DeskOS to ${targetUrl}`)
+    }
+  })
   win.on('resize', repositionActiveView)
   attachDiagnostics(win.webContents, 'main')
   if (FORCE_DEVTOOLS) win.webContents.openDevTools({ mode: 'detach' })

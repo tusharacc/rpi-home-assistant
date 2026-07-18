@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react'
+import type { MouseEvent } from 'react'
 import { AlertTriangle, X } from 'lucide-react'
+import type { ArticleReaderRequest } from './types'
 import styles from './ArticleReaderModal.module.css'
 
 interface ArticleReaderModalProps {
   url: string
   title: string
   onClose: () => void
+  onNavigate: (request: ArticleReaderRequest) => void
 }
 
 interface ExtractedArticle {
@@ -104,7 +107,7 @@ const articleBylineStyle: React.CSSProperties = {
   marginBottom: '1.5rem',
 }
 
-export function ArticleReaderModal({ url, title, onClose }: ArticleReaderModalProps) {
+export function ArticleReaderModal({ url, title, onClose, onNavigate }: ArticleReaderModalProps) {
   const [status, setStatus] = useState<'loading' | 'error' | 'success'>('loading')
   const [article, setArticle] = useState<ExtractedArticle | null>(null)
 
@@ -133,6 +136,23 @@ export function ArticleReaderModal({ url, title, onClose }: ArticleReaderModalPr
     }
   }, [url])
 
+  // Extracted content can contain raw <a href> links (e.g. arXiv's "View
+  // PDF") with no target="_blank" -- left alone, that's a same-window
+  // navigation that hijacks the entire kiosk window (no back/close button in
+  // kiosk mode; confirmed live, only Alt+F4 got out of it, closing the whole
+  // app). Re-route link clicks through the reader itself instead: re-extract
+  // the linked URL and show it in this same modal. PDFs will just show the
+  // "couldn't load a readable version" error state -- not ideal, but a closed
+  // system, never a hijacked kiosk.
+  function handleContentClick(event: MouseEvent<HTMLDivElement>): void {
+    const anchor = (event.target as HTMLElement).closest('a')
+    if (!anchor) return
+    const href = anchor.getAttribute('href')
+    if (!href || !/^https?:\/\//.test(href)) return
+    event.preventDefault()
+    onNavigate({ url: href, title: anchor.textContent?.trim() || title })
+  }
+
   return (
     <div style={overlayStyle}>
       <div style={headerStyle}>
@@ -155,7 +175,11 @@ export function ArticleReaderModal({ url, title, onClose }: ArticleReaderModalPr
             <div style={articleTitleStyle}>{article.title || title}</div>
             {article.byline && <div style={articleBylineStyle}>{article.byline}</div>}
             {/* Sanitized server-side via sanitize-html before this ever reaches the client. */}
-            <div className={styles.content} dangerouslySetInnerHTML={{ __html: article.content }} />
+            <div
+              className={styles.content}
+              onClick={handleContentClick}
+              dangerouslySetInnerHTML={{ __html: article.content }}
+            />
           </article>
         )}
       </div>
