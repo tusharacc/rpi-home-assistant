@@ -151,7 +151,6 @@ Each application is a plugin registered in `packages/frontend/src/plugins/regist
 | Settings | Active | System uptime, display orientation, Shut Down, Exit to Desktop (Standby Now temporarily disabled — see below) |
 | Investments | Placeholder | Coming later |
 | Home Automation | Placeholder | Coming later |
-| Raspberry Pi Desktop | Placeholder | Coming later |
 
 ## Display, Power & Settings
 
