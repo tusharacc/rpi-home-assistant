@@ -87,11 +87,30 @@ sudo systemctl start deskos-kiosk
 
 ### Deploying Updates
 
-For pulling later changes onto an already-set-up Pi (not the one-time setup above):
+For pulling later changes onto an already-set-up Pi (not the one-time setup above), run
+`scripts/deploy-to-pi.sh` **from your Mac** (not on the Pi) — it automates the whole sequence: copying
+gitignored local state (`.env`, a locally-populated `news.db`) the Pi needs, then SSHing in to pull,
+build, reinstall services, and restart.
 
 ```bash
-# From your Mac, if .env or a locally-populated news.db need to travel with this
-# update (both are gitignored, so `git pull` alone won't carry them):
+export DESKOS_PI_USER=<pi-user>
+export DESKOS_PI_HOST=<pi-host>
+export DESKOS_PI_DIR=<repo-path-on-pi>
+./scripts/deploy-to-pi.sh
+```
+
+(Or pass `--user`/`--host`/`--dir` instead of exporting env vars.) By default it deploys whatever
+branch is currently checked out locally — refuses to run if that branch has unpushed commits or
+uncommitted changes, since the Pi does its own `git pull` and would otherwise silently deploy nothing
+new. Pass `--branch <name>` to deploy a specific branch regardless of what's checked out locally,
+`--skip-transfer` to skip the `.env`/`news.db` copy (e.g. they already match on the Pi), or
+`--trigger-pipeline` to also manually start the news pipeline once instead of waiting up to 3 days for
+the timer.
+
+Equivalent manual steps, if you'd rather run them by hand or the script doesn't fit your setup:
+
+```bash
+# From your Mac
 scp .env <pi-user>@<pi-host>:<repo-path-on-pi>/.env
 scp packages/backend/data/news.db* <pi-user>@<pi-host>:<repo-path-on-pi>/packages/backend/data/   # only if a local db exists
 
@@ -99,24 +118,19 @@ scp packages/backend/data/news.db* <pi-user>@<pi-host>:<repo-path-on-pi>/package
 ssh <pi-user>@<pi-host>
 cd <repo-path-on-pi>
 git fetch && git checkout main && git pull
-npm install          # better-sqlite3 is a native module — must build on-device (ARM), not copied from macOS
+npm install          # better-sqlite3/electron are native/prebuilt-binary modules — must install on-device (ARM)
 npm run build        # backend + frontend + packages/electron
 ./scripts/install-services.sh    # idempotent; re-run any time a .service/.sudoers/.desktop file changes
 sudo systemctl restart deskos-backend
-sudo systemctl restart deskos-kiosk   # picks up frontend changes (e.g. the article reader modal)
+sudo systemctl restart deskos-kiosk
+sudo systemctl start deskos-news-pipeline.service   # optional, only if you want the queue populated now
 ```
 
 `install-services.sh` is safe to re-run even when nothing changed — it re-templates and reinstalls
 every unit file, both sudoers rules, and the "Return to DeskOS" desktop icon idempotently. Always
 re-run it after pulling changes that touch anything under `scripts/*.service`, `scripts/*.sudoers`,
-or `scripts/*.desktop`, since those aren't picked up by `npm run build` alone.
-
-If the update includes news-pipeline changes and you want the reading queue populated immediately
-rather than waiting up to 3 days for the timer:
-```bash
-sudo systemctl start deskos-news-pipeline.service
-journalctl -u deskos-news-pipeline.service -f
-```
+or `scripts/*.desktop`, since those aren't picked up by `npm run build` alone (`deploy-to-pi.sh`
+already re-runs it every time, unconditionally).
 
 ### Troubleshooting
 
