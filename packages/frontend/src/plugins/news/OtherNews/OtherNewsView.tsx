@@ -91,7 +91,12 @@ export function OtherNewsView() {
         )}
       </div>
       {reader && (
-        <ArticleReaderModal url={reader.url} title={reader.title} onClose={() => setReader(null)} />
+        <ArticleReaderModal
+          url={reader.url}
+          title={reader.title}
+          onClose={() => setReader(null)}
+          onNavigate={setReader}
+        />
       )}
     </div>
   )

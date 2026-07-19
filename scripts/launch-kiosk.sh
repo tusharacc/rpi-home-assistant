@@ -1,29 +1,27 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-DESKOS_URL="${DESKOS_URL:-http://localhost:3001}"
-CHROMIUM_PROFILE="${CHROMIUM_PROFILE:-$HOME/.deskos-chromium}"
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-# Detect Chromium binary (chromium-browser on Bullseye, chromium on Bookworm)
-CHROMIUM_BIN=$(command -v chromium-browser || command -v chromium)
-if [[ -z "$CHROMIUM_BIN" ]]; then
-  echo "ERROR: Chromium not found. Install with: sudo apt install chromium-browser" >&2
+export DESKOS_URL="${DESKOS_URL:-http://localhost:3001}"
+
+ELECTRON_BIN="${REPO_DIR}/node_modules/.bin/electron"
+MAIN_JS="${REPO_DIR}/packages/electron/dist/main.js"
+
+if [[ ! -x "$ELECTRON_BIN" ]]; then
+  echo "ERROR: Electron not found at ${ELECTRON_BIN}. Run 'npm install' at the repo root." >&2
+  exit 1
+fi
+if [[ ! -f "$MAIN_JS" ]]; then
+  echo "ERROR: ${MAIN_JS} not found. Run 'npm run build' at the repo root." >&2
   exit 1
 fi
 
-# Disable screen saver and power management
+# Disable screen saver and power management. X11/XWayland-level, independent
+# of which browser/Electron process runs on top -- Electron reaches the
+# display via XWayland exactly like Chromium did (see CLAUDE.md).
 xset s off
 xset s noblank
 xset -dpms
 
-"${CHROMIUM_BIN}" \
-  --kiosk \
-  --user-data-dir="${CHROMIUM_PROFILE}" \
-  --no-first-run \
-  --disable-default-apps \
-  --disable-popup-blocking \
-  --disable-translate \
-  --noerrdialogs \
-  --disable-infobars \
-  --disable-session-crashed-bubble \
-  "${DESKOS_URL}"
+exec "${ELECTRON_BIN}" "${MAIN_JS}"

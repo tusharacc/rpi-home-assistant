@@ -2,14 +2,6 @@ import { Newspaper, BookOpen, Globe } from 'lucide-react'
 import type { Plugin } from '../types'
 import { OtherNewsView } from './OtherNews/OtherNewsView'
 
-function openEpaper(site: 'the-hindu' | 'livemint'): void {
-  fetch('/api/system/open-epaper', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ site }),
-  }).catch(() => {})
-}
-
 export const newsPlugin: Plugin = {
   id: 'news',
   name: 'News',
@@ -22,16 +14,16 @@ export const newsPlugin: Plugin = {
       label: 'The Hindu',
       finePrint: 'ePaper Edition',
       icon: <BookOpen size={14} />,
-      contentMode: 'external',
-      onActivate: () => openEpaper('the-hindu'),
+      contentMode: 'embedded-webview',
+      embeddedUrl: 'https://epaper.thehindu.com',
     },
     {
       id: 'news-livemint',
       label: 'LiveMint',
       finePrint: 'ePaper Edition',
       icon: <BookOpen size={14} />,
-      contentMode: 'external',
-      onActivate: () => openEpaper('livemint'),
+      contentMode: 'embedded-webview',
+      embeddedUrl: 'https://epaper.livemint.com',
     },
     {
       id: 'news-other',

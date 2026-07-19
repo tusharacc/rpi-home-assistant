@@ -1,0 +1,48 @@
+{
+  "name": "electron-migration-upgrade",
+  "type": "upgrade",
+  "workflowType": "full",
+  "created": "2026-07-12T10:27:32Z",
+  "currentPhase": "complete",
+  "status": "active",
+  "branch": "upgrade/electron-migration-upgrade",
+  "roles": {
+    "po": { "status": "complete", "completed": "2026-07-12T10:40:00Z" },
+    "architect": { "status": "complete", "completed": "2026-07-12T11:15:00Z" },
+    "developer": { "status": "complete", "completed": "2026-07-12T13:40:00Z" },
+    "reviewer": { "status": "complete", "completed": "2026-07-12T13:50:00Z" },
+    "tester": { "status": "complete", "completed": "2026-07-12T14:05:00Z" },
+    "executor": { "status": "complete", "completed": "2026-07-18T20:00:00Z" },
+    "po-approval": { "status": "complete", "completed": "2026-07-18T20:05:00Z" }
+  },
+  "artifacts": {
+    "po": "artifacts/electron-migration-upgrade.po.md",
+    "architect": "artifacts/electron-migration-upgrade.architect.md",
+    "developer": "artifacts/electron-migration-upgrade.developer.md",
+    "reviewer": "artifacts/electron-migration-upgrade.reviewer.md",
+    "tester": "artifacts/electron-migration-upgrade.tester.md",
+    "executor": "artifacts/electron-migration-upgrade.executor.md",
+    "po-approval": "artifacts/electron-migration-upgrade.po-approval.md",
+    "code-quality-report": "artifacts/electron-migration-upgrade.code-quality-report.md"
+  },
+  "timelines": {
+    "po_complete": "2026-07-12T10:40:00Z",
+    "architect_start": "2026-07-12T10:41:00Z",
+    "architect_complete": "2026-07-12T11:15:00Z",
+    "developer_start": "2026-07-12T11:16:00Z",
+    "developer_complete": "2026-07-12T12:30:00Z",
+    "reviewer_start": "2026-07-12T12:31:00Z",
+    "reviewer_blocked": "2026-07-12T13:23:47Z",
+    "developer_start_2": "2026-07-12T13:24:00Z",
+    "developer_complete_2": "2026-07-12T13:40:00Z",
+    "reviewer_start_2": "2026-07-12T13:41:00Z",
+    "reviewer_complete": "2026-07-12T13:50:00Z",
+    "tester_start": "2026-07-12T13:51:00Z",
+    "tester_complete": "2026-07-12T14:05:00Z",
+    "executor_start": "2026-07-18T19:00:00Z",
+    "executor_complete": "2026-07-18T20:00:00Z",
+    "po_approval_start": "2026-07-18T20:00:00Z",
+    "po_approval_complete": "2026-07-18T20:05:00Z",
+    "complete": "2026-07-18T20:05:00Z"
+  }
+}

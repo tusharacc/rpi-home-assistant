@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, type ReactNode } from 'react'
 import { pluginRegistry } from '../../plugins/registry'
 import { ReactContainer } from './ReactContainer'
+import { EmbeddedWebviewContainer } from './EmbeddedWebviewContainer'
 import styles from './ContentArea.module.css'
 
 interface ContentAreaProps {
@@ -39,48 +40,38 @@ function WelcomeScreen() {
 }
 
 export function ContentArea({ activeItemId }: ContentAreaProps) {
+  let content: ReactNode
+
   if (!activeItemId) {
-    return (
-      <main className={styles.contentArea}>
-        <WelcomeScreen />
-      </main>
-    )
-  }
+    content = <WelcomeScreen />
+  } else {
+    const item = pluginRegistry.findItem(activeItemId)
 
-  const item = pluginRegistry.findItem(activeItemId)
-
-  if (!item) {
-    return (
-      <main className={styles.contentArea}>
+    if (!item) {
+      content = (
         <div className={styles.errorState}>
           <span className={styles.errorLabel}>NOT FOUND</span>
           <span className={styles.errorMessage}>Plugin '{activeItemId}' is not registered.</span>
         </div>
-      </main>
-    )
-  }
-
-  if (item.contentMode === 'external') {
-    // Reached only via a stale persisted activeItemId from before this item
-    // became external-only (it never becomes active going forward — see
-    // SidebarItem/SidebarWidget). Self-resolves once any other item is picked.
-    return (
-      <main className={styles.contentArea}>
+      )
+    } else if (item.contentMode === 'external') {
+      // Reached only via a stale persisted activeItemId from before this item
+      // became external-only (it never becomes active going forward — see
+      // SidebarItem/SidebarWidget). Self-resolves once any other item is picked.
+      content = (
         <div className={styles.errorState}>
           <span className={styles.errorLabel}>OPENS SEPARATELY</span>
           <span className={styles.errorMessage}>
             Select '{'label' in item ? item.label : item.name}' again from the sidebar to reopen it.
           </span>
         </div>
-      </main>
-    )
+      )
+    } else if (item.contentMode === 'embedded-webview' && item.embeddedUrl) {
+      content = <EmbeddedWebviewContainer viewId={item.id} url={item.embeddedUrl} />
+    } else {
+      content = <ReactContainer>{item.render?.() ?? null}</ReactContainer>
+    }
   }
 
-  return (
-    <main className={styles.contentArea}>
-      <ReactContainer>
-        {item.render?.() ?? null}
-      </ReactContainer>
-    </main>
-  )
+  return <main className={styles.contentArea}>{content}</main>
 }

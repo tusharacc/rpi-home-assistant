@@ -1,5 +1,5 @@
 [Unit]
-Description=DeskOS Kiosk (Chromium)
+Description=DeskOS Kiosk (Electron)
 After=graphical.target deskos-backend.service
 Wants=deskos-backend.service
 Requires=graphical.target
